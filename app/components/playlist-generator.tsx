@@ -8,6 +8,7 @@ const PlaylistGenerator = () => {
   const [startLocation, setStartLocation] = useState('');
   const [endLocation, setEndLocation] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleCreatePlaylist = async () => {
     if (!session) {
@@ -16,6 +17,8 @@ const PlaylistGenerator = () => {
     }
 
     setLoading(true);
+    setError('');
+    
     try {
       const response = await fetch('/api/create-playlist', {
         method: 'POST',
@@ -28,14 +31,16 @@ const PlaylistGenerator = () => {
         }),
       });
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error('Failed to create playlist');
+        throw new Error(data.error || 'Failed to create playlist');
       }
 
-      const data = await response.json();
       window.open(data.playlistUrl, '_blank');
     } catch (error) {
       console.error('Error creating playlist:', error);
+      setError(error instanceof Error ? error.message : 'Failed to create playlist');
     } finally {
       setLoading(false);
     }
@@ -43,6 +48,11 @@ const PlaylistGenerator = () => {
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
       <div className="space-y-2">
         <label htmlFor="start" className="block text-sm font-medium text-gray-700">
           Start Location

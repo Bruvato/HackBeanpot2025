@@ -20,6 +20,7 @@ async function searchLocationBasedTracks(location: string, accessToken: string) 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
+    
     if (!session?.accessToken) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
@@ -30,18 +31,25 @@ export async function POST(req: Request) {
     // Get user's Spotify ID
     const userResponse = await fetch('https://api.spotify.com/v1/me', {
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${accessToken}`,
       },
     });
+
+    if (!userResponse.ok) {
+      const errorData = await userResponse.text();
+      console.error('Failed to get user profile:', errorData);
+      return NextResponse.json({ error: 'Failed to authenticate with Spotify' }, { status: 401 });
+    }
+
     const userData = await userResponse.json();
 
     // Create a new playlist
     const playlistResponse = await fetch(
-      `https://api.spotify.com/v1/users/${userData.id}/playlists`,
+      'https://api.spotify.com/v1/me/playlists',
       {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -51,6 +59,13 @@ export async function POST(req: Request) {
         }),
       }
     );
+
+    if (!playlistResponse.ok) {
+      const errorData = await playlistResponse.text();
+      console.error('Failed to create playlist:', errorData);
+      return NextResponse.json({ error: 'Failed to create playlist' }, { status: playlistResponse.status });
+    }
+
     const playlistData = await playlistResponse.json();
 
     // Get tracks for both locations
