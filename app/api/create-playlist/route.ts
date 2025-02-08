@@ -27,6 +27,10 @@ async function generatePlaylistDescription(startLocation: string, endLocation: s
   }
 }
 
+interface Track {
+  uri: string;
+}
+
 async function searchLocationBasedTracks(location: string, accessToken: string) {
   // Search for tracks related to the location
   const searchResponse = await fetch(
@@ -39,7 +43,7 @@ async function searchLocationBasedTracks(location: string, accessToken: string) 
   );
   
   const searchData = await searchResponse.json();
-  return searchData.tracks.items.map((track: any) => track.uri);
+  return searchData.tracks.items.map((track: Track) => track.uri);
 }
 
 export async function POST(req: Request) {
@@ -65,8 +69,6 @@ export async function POST(req: Request) {
       console.error('Failed to get user profile:', errorData);
       return NextResponse.json({ error: 'Failed to authenticate with Spotify' }, { status: 401 });
     }
-
-    const userData = await userResponse.json();
 
     // Generate AI description
     const description = await generatePlaylistDescription(startLocation, endLocation);
