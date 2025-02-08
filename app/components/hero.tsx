@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
+
 import { AiOutlineSearch } from "react-icons/ai";
 
 import { Button } from "../components/ui/button";
@@ -9,11 +11,23 @@ import { Input } from "../components/ui/input";
 export default function Hero() {
   const [start, setStart] = useState("");
   const [destination, setDestination] = useState("");
+  const [date, setDate] = useState("");
+  const router = useRouter(); // Initialize useRouter
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission (e.g., redirect to search results page)
-    console.log("Searching for:", { start, destination });
+
+    // Set default date to today if none is provided
+    const today = new Date().toISOString().split("T")[0];
+    const tripDate = date || today;
+
+    router.push(
+      `/dashboard?start=${encodeURIComponent(
+        start
+      )}&destination=${encodeURIComponent(
+        destination
+      )}&date=${encodeURIComponent(tripDate)}`
+    );
   };
 
   return (
@@ -35,8 +49,9 @@ export default function Hero() {
               <Input
                 type="text"
                 placeholder="Choose starting point..."
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
+                value={start}
+                onChange={(e) => setStart(e.target.value)}
+                required
                 className="w-full"
               />
             </div>
@@ -44,8 +59,9 @@ export default function Hero() {
               <Input
                 type="text"
                 placeholder="Choose destination..."
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                required
                 className="w-full"
               />
             </div>
@@ -53,8 +69,8 @@ export default function Hero() {
               <Input
                 type="date"
                 placeholder="Pick date..."
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
                 className="w-full"
               />
             </div>
