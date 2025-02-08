@@ -1,6 +1,31 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+
+async function generatePlaylistDescription(startLocation: string, endLocation: string) {
+  try {
+    // Initialize the model
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    const prompt = `Create a short, fun Spotify playlist description for a road trip from ${startLocation} to ${endLocation}. 
+                   Include the mood of the journey and why the music fits the trip. 
+                   Keep it under 300 characters and make it engaging.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const description = response.text()
+      .trim()
+      .slice(0, 300);
+      
+    return description || `A musical journey from ${startLocation} to ${endLocation}`;
+  } catch (error) {
+    console.error('Error generating description:', error);
+    return `A musical journey from ${startLocation} to ${endLocation}`;
+  }
+}
 
 async function searchLocationBasedTracks(location: string, accessToken: string) {
   // Search for tracks related to the location
@@ -43,6 +68,9 @@ export async function POST(req: Request) {
 
     const userData = await userResponse.json();
 
+    // Generate AI description
+    const description = await generatePlaylistDescription(startLocation, endLocation);
+
     // Create a new playlist
     const playlistResponse = await fetch(
       'https://api.spotify.com/v1/me/playlists',
@@ -54,7 +82,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           name: `Journey from ${startLocation} to ${endLocation}`,
-          description: `A musical journey from ${startLocation} to ${endLocation}`,
+          description: description,
           public: true,
         }),
       }
