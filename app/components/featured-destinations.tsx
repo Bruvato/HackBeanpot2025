@@ -16,11 +16,26 @@ const destinations = [
     image: "/placeholder.svg?height=200&width=300",
     description: "Stunning mountain views in Virginia and North Carolina",
   },
+  {
+    name: "Blue Ridge Parkway",
+    image: "/placeholder.svg?height=200&width=300",
+    description: "Stunning mountain views in Virginia and North Carolina",
+  },
+  {
+    name: "Blue Ridge Parkway",
+    image: "/placeholder.svg?height=200&width=300",
+    description: "Stunning mountain views in Virginia and North Carolina",
+  },
+  {
+    name: "Blue Ridge Parkway",
+    image: "/placeholder.svg?height=200&width=300",
+    description: "Stunning mountain views in Virginia and North Carolina",
+  },
 ];
 
 export default function FeaturedDestinations() {
   return (
-    <section className="py-16 bg-gray-100">
+    <section className="py-16 bg-background">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8 text-center">
           Featured Road Trip Destinations
@@ -29,7 +44,7 @@ export default function FeaturedDestinations() {
           {destinations.map((destination, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
+              className="bg-card text-card-foreground rounded-lg shadow-sm overflow-hidden"
             >
               <Image
                 src={destination.image || "/placeholder.svg"}
@@ -42,7 +57,9 @@ export default function FeaturedDestinations() {
                 <h3 className="text-xl font-semibold mb-2">
                   {destination.name}
                 </h3>
-                <p className="text-gray-600">{destination.description}</p>
+                <p className="text-muted-foreground">
+                  {destination.description}
+                </p>
               </div>
             </div>
           ))}

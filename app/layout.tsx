@@ -1,14 +1,19 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import AuthProvider from './components/providers/session-provider'
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ['latin'] })
+import { ThemeProvider } from "./components/theme-provider";
+import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: 'Road Trip Playlist Generator',
-  description: 'Generate playlists for your road trips',
-}
+  title: "RoadTrippr - Plan Your Perfect Road Trip",
+  description:
+    "Discover amazing routes, attractions, and create unforgettable memories with RoadTrippr.",
+};
 
 export default function RootLayout({
   children,
@@ -17,10 +22,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
+      <body className={`${inter.className} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
-        </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )
