@@ -1,17 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession, signIn } from 'next-auth/react';
 
 const PlaylistGenerator = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [startLocation, setStartLocation] = useState('');
   const [endLocation, setEndLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [pendingCreate, setPendingCreate] = useState(false);
+
+  // Save form data before redirecting to login
+  const saveFormData = () => {
+    sessionStorage.setItem('pendingPlaylist', JSON.stringify({
+      startLocation,
+      endLocation,
+      pending: true
+    }));
+  };
+
+  // Check for pending playlist creation after login
+  useEffect(() => {
+    if (session && status === 'authenticated') {
+      const savedData = sessionStorage.getItem('pendingPlaylist');
+      if (savedData) {
+        const { startLocation: savedStart, endLocation: savedEnd, pending } = JSON.parse(savedData);
+        if (pending) {
+          setStartLocation(savedStart);
+          setEndLocation(savedEnd);
+          setPendingCreate(true);
+          sessionStorage.removeItem('pendingPlaylist');
+        }
+      }
+    }
+  }, [session, status]);
+
+  // Automatically create playlist if pending after login
+  useEffect(() => {
+    if (pendingCreate && session && startLocation && endLocation) {
+      handleCreatePlaylist();
+      setPendingCreate(false);
+    }
+  }, [pendingCreate, session, startLocation, endLocation]);
 
   const handleCreatePlaylist = async () => {
     if (!session) {
+      saveFormData();
       signIn('spotify');
       return;
     }
