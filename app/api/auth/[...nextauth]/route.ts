@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 import { JWT } from "next-auth/jwt";
-import { Session } from "next-auth";
+import { Session, Account } from "next-auth";
 
 // Extend the built-in types for NextAuth
 declare module "next-auth" {
@@ -17,9 +17,12 @@ declare module "next-auth" {
   }
 }
 
+// Validate required environment variables
+if (!process.env.SPOTIFY_CLIENT_ID) throw new Error('Missing SPOTIFY_CLIENT_ID');
+if (!process.env.SPOTIFY_CLIENT_SECRET) throw new Error('Missing SPOTIFY_CLIENT_SECRET');
+if (!process.env.NEXTAUTH_SECRET) throw new Error('Missing NEXTAUTH_SECRET');
+
 const SPOTIFY_REFRESH_TOKEN_URL = 'https://accounts.spotify.com/api/token';
-const CLIENT_ID = "9e741abf5077461aa44431a2a2388d68";
-const CLIENT_SECRET = "89ae1e294ea6414aadc3e04b32e9e633";
 
 const scopes = [
   "playlist-modify-public",
@@ -30,7 +33,9 @@ const scopes = [
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
-    const basicAuth = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64");
+    const basicAuth = Buffer.from(
+      `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+    ).toString("base64");
 
     const response = await fetch(SPOTIFY_REFRESH_TOKEN_URL, {
       method: 'POST',
@@ -68,19 +73,18 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 export const authOptions = {
   providers: [
     SpotifyProvider({
-      clientId: CLIENT_ID,
-      clientSecret: CLIENT_SECRET,
+      clientId: process.env.SPOTIFY_CLIENT_ID!,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
       authorization: {
         params: {
           scope: scopes,
-          show_dialog: true  // Force re-consent
+          show_dialog: true
         },
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, account }: { token: JWT; account: any }) {
-      // Initial sign in
+    async jwt({ token, account }: { token: JWT; account: Account | null }) {
       if (account) {
         return {
           accessToken: account.access_token,
@@ -89,7 +93,7 @@ export const authOptions = {
         };
       }
 
-      // Return previous token if the access token has not expired yet
+      // Return previous token if the access token has not expired
       if (Date.now() < (token.accessTokenExpires as number)) {
         return token;
       }
@@ -97,12 +101,11 @@ export const authOptions = {
       // Access token has expired, try to refresh it
       return await refreshAccessToken(token);
     },
-    async session({ session, token }: { session: Session; token: JWT }) {
+    async session({ session, token }: { session: Session, token: JWT }) {
       if (token) {
         session.accessToken = token.accessToken;
         session.error = token.error;
         
-        // Add user information to the session
         if (session.user) {
           session.user.accessToken = token.accessToken;
         }
@@ -114,9 +117,10 @@ export const authOptions = {
     signIn: '/',
     error: '/',
   },
-  debug: true,  // Enable debug messages
-  secret: "89ae1e294ea6414aadc3e04b32e9e633", // Add NextAuth secret
+  debug: true,
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
+
 export { handler as GET, handler as POST };
