@@ -13,6 +13,8 @@ import {
   InfoWindow,
 } from "@react-google-maps/api";
 import { Input } from "../components/ui/input";
+import Header from "../components/header";
+import Footer from "../components/footer";
 
 const mapContainerStyle = {
   width: "100%",
@@ -452,12 +454,11 @@ export default function Dashboard() {
     throw new Error("Missing GOOGLE_MAPS_API_KEY");
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen flex flex-col">
+      <Header />
       <div className="max-w-7xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Your Road Trip
-          </h1>
+        <div className="rounded-lg shadow-sm p-6 mb-6">
+          <h1 className="text-2xl font-bold mb-4">Your Road Trip</h1>
 
           <div className="mb-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -509,7 +510,7 @@ export default function Dashboard() {
                   onChange={(e) => setAvoidHighways(e.target.checked)}
                   className="form-checkbox h-4 w-4 text-blue-600"
                 />
-                <span className="text-gray-700">Avoid Highways</span>
+                <span className="text-muted-foreground">Avoid Highways</span>
               </label>
               <label className="flex items-center space-x-2">
                 <input
@@ -518,12 +519,12 @@ export default function Dashboard() {
                   onChange={(e) => setAvoidTolls(e.target.checked)}
                   className="form-checkbox h-4 w-4 text-blue-600"
                 />
-                <span className="text-gray-700">Avoid Tolls</span>
+                <span className="text-muted-foreground">Avoid Tolls</span>
               </label>
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-sm font-medium text-gray-700">
+              <h3 className="text-sm font-medium text-muted-foreground">
                 Show Places:
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -541,7 +542,7 @@ export default function Dashboard() {
                       }}
                       className="form-checkbox h-4 w-4"
                     />
-                    <span className="ml-2 text-sm text-gray-700">
+                    <span className="ml-2 text-sm text-muted-foreground">
                       {type.label}
                     </span>
                   </label>
@@ -549,22 +550,19 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <p className="text-gray-600">
-              From: <span className="font-medium text-gray-900">{start}</span>
+            <p className="">
+              From: <span className="font-medium">{start}</span>
             </p>
-            <p className="text-gray-600">
-              To:{" "}
-              <span className="font-medium text-gray-900">{destination}</span>
+            <p className="">
+              To: <span className="font-medium">{destination}</span>
             </p>
-            <p className="text-gray-600">
-              Date: <span className="font-medium text-gray-900">{date}</span>
+            <p className="">
+              Date: <span className="font-medium">{date}</span>
             </p>
 
             {routeInfos.length > 0 && (
               <div className="mt-4 space-y-2">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Available Routes:
-                </h3>
+                <h3 className="text-lg font-semibold ">Available Routes:</h3>
                 {routeInfos.map((info, index) => (
                   <div
                     key={index}
@@ -662,7 +660,7 @@ export default function Dashboard() {
                 position={selectedLocation.position}
                 onCloseClick={() => setSelectedLocation(null)}
               >
-                <div className="max-w-sm p-2">
+                <div className="max-w-sm p-2 text-gray-700">
                   <h3 className="text-lg font-semibold mb-2">
                     {selectedLocation.name}
                   </h3>
@@ -715,6 +713,7 @@ export default function Dashboard() {
           <PlaylistGenerator startLocation={start} endLocation={destination} />
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
