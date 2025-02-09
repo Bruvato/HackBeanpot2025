@@ -10,6 +10,8 @@ const PlaylistGenerator = ({ startLocation: initialStart, endLocation: initialEn
   const [error, setError] = useState('');
   const [pendingCreate, setPendingCreate] = useState(false);
   const [genres, setGenres] = useState<{ start: string[], end: string[] } | null>(null);
+  const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
+  const [previousLocations, setPreviousLocations] = useState({ start: initialStart, end: initialEnd });
 
   // Save form data before redirecting to login
   const saveFormData = () => {
@@ -34,6 +36,22 @@ const PlaylistGenerator = ({ startLocation: initialStart, endLocation: initialEn
     }
   }, [session, status]);
 
+  // Watch for changes in start or end location
+  useEffect(() => {
+    // Only update if the locations have actually changed and are not empty
+    if (
+      initialStart && 
+      initialEnd && 
+      session && 
+      (initialStart !== previousLocations.start || initialEnd !== previousLocations.end) &&
+      initialStart !== "Unknown Start" && 
+      initialEnd !== "Unknown Destination"
+    ) {
+      handleCreatePlaylist();
+      setPreviousLocations({ start: initialStart, end: initialEnd });
+    }
+  }, [initialStart, initialEnd, session]);
+
   // Automatically create playlist if pending after login
   useEffect(() => {
     if (pendingCreate && session) {
@@ -52,6 +70,7 @@ const PlaylistGenerator = ({ startLocation: initialStart, endLocation: initialEn
     setLoading(true);
     setError('');
     setGenres(null);
+    setPlaylistUrl(null);
     setLoadingStatus('Analyzing locations for music genres...');
     
     try {
@@ -78,7 +97,9 @@ const PlaylistGenerator = ({ startLocation: initialStart, endLocation: initialEn
         end: data.endLocationGenres
       });
 
-      window.open(data.playlistUrl, '_blank');
+      // Extract playlist ID from URL and set it
+      const playlistId = data.playlistUrl.split('/playlist/')[1];
+      setPlaylistUrl(playlistId);
     } catch (error) {
       console.error('Error creating playlist:', error);
       setError(error instanceof Error ? error.message : 'Failed to create playlist');
@@ -96,33 +117,41 @@ const PlaylistGenerator = ({ startLocation: initialStart, endLocation: initialEn
         </div>
       )}
       
-      <button
-        onClick={handleCreatePlaylist}
-        disabled={loading}
-        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-      >
-        {loading ? (
-          <div className="flex items-center">
-            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Creating Playlist...
-          </div>
-        ) : 'Generate Road Trip Playlist'}
-      </button>
+      {!playlistUrl && (
+        <button
+          onClick={handleCreatePlaylist}
+          disabled={loading}
+          className="w-full bg-[#1DB954] text-white font-bold py-2 px-4 rounded hover:bg-[#1ed760] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? loadingStatus : 'Generate Road Trip Playlist'}
+        </button>
+      )}
 
-      {loading && loadingStatus && (
-        <div className="text-sm text-gray-600 animate-pulse mt-2">
-          {loadingStatus}
+      {loading && (
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1DB954] mx-auto"></div>
         </div>
       )}
 
       {genres && (
-        <div className="mt-4 space-y-2 text-sm">
-          <p className="font-medium">Playlist Genres:</p>
-          <p><span className="font-medium">{initialStart}:</span> {genres.start.join(', ')}</p>
-          <p><span className="font-medium">{initialEnd}:</span> {genres.end.join(', ')}</p>
+        <div className="space-y-2 text-sm">
+          <p><strong>Starting Location Vibes:</strong> {genres.start.join(', ')}</p>
+          <p><strong>Destination Vibes:</strong> {genres.end.join(', ')}</p>
+        </div>
+      )}
+
+      {playlistUrl && (
+        <div className="w-full h-[450px] bg-[#282828] rounded-lg overflow-hidden shadow-lg">
+          <iframe
+            src={`https://open.spotify.com/embed/playlist/${playlistUrl}?utm_source=generator&theme=0`}
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            allowFullScreen
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            className="rounded-lg"
+          />
         </div>
       )}
     </div>
