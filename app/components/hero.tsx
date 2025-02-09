@@ -8,21 +8,7 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 
-import {
-  GoogleMap,
-  useJsApiLoader,
-  Autocomplete,
-} from "@react-google-maps/api";
-
-const containerStyle = {
-  width: "400px",
-  height: "400px",
-};
-
-const center = {
-  lat: -3.745,
-  lng: -38.523,
-};
+import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 
 export default function Hero() {
   // const [start, setStart] = useState("");

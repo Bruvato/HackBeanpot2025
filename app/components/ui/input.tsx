@@ -1,9 +1,21 @@
 import * as React from "react";
 
 import { cn } from "../lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+
+const inputVariants = cva({
+  variants: {},
+  defaultVariants: {
+    variant: "default",
+    size: "default",
+  },
+});
 
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+  extends React.InputHTMLAttributes<HTMLInputElement>,
+    VariantProps<typeof inputVariants> {
+  asChild?: boolean;
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => {

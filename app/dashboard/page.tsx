@@ -1,11 +1,11 @@
 "use client";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
 import { useEffect, useState, useCallback, useRef } from "react";
 import {
   GoogleMap,
   useLoadScript,
-  DirectionsService,
   DirectionsRenderer,
   Libraries,
   Autocomplete,
@@ -471,7 +471,7 @@ export default function Dashboard() {
                   onPlaceChanged={onStartPlaceChanged}
                   options={{ types: ["geocode"] }}
                 >
-                  <input
+                  <Input
                     type="text"
                     placeholder="Choose starting point..."
                     value={startInput}
@@ -490,7 +490,7 @@ export default function Dashboard() {
                   onPlaceChanged={onDestPlaceChanged}
                   options={{ types: ["geocode"] }}
                 >
-                  <input
+                  <Input
                     type="text"
                     placeholder="Choose destination..."
                     value={destinationInput}
@@ -504,7 +504,7 @@ export default function Dashboard() {
 
             <div className="flex gap-4 mt-4">
               <label className="flex items-center space-x-2">
-                <input
+                <Input
                   type="checkbox"
                   checked={avoidHighways}
                   onChange={(e) => setAvoidHighways(e.target.checked)}
@@ -513,7 +513,7 @@ export default function Dashboard() {
                 <span className="text-muted-foreground">Avoid Highways</span>
               </label>
               <label className="flex items-center space-x-2">
-                <input
+                <Input
                   type="checkbox"
                   checked={avoidTolls}
                   onChange={(e) => setAvoidTolls(e.target.checked)}
@@ -530,7 +530,7 @@ export default function Dashboard() {
               <div className="flex flex-wrap gap-2">
                 {locationTypes.map((type) => (
                   <label key={type.value} className="inline-flex items-center">
-                    <input
+                    <Input
                       type="checkbox"
                       checked={selectedTypes.includes(type.value)}
                       onChange={(e) => {
@@ -635,25 +635,26 @@ export default function Dashboard() {
               </>
             )}
 
-            {locations.map((location, index) => {
-              const locationType = locationTypes.find(
-                (t) => t.value === location.type
-              );
-              return (
-                <Marker
-                  key={`location-${index}`}
-                  position={location.position}
-                  title={location.name}
-                  icon={{
-                    url: `http://maps.google.com/mapfiles/ms/icons/${
-                      locationType?.color || "red"
-                    }-dot.png`,
-                    scaledSize: new google.maps.Size(32, 32),
-                  }}
-                  onClick={() => setSelectedLocation(location)}
-                />
-              );
-            })}
+            {isLoadingLocations &&
+              locations.map((location, index) => {
+                const locationType = locationTypes.find(
+                  (t) => t.value === location.type
+                );
+                return (
+                  <Marker
+                    key={`location-${index}`}
+                    position={location.position}
+                    title={location.name}
+                    icon={{
+                      url: `http://maps.google.com/mapfiles/ms/icons/${
+                        locationType?.color || "red"
+                      }-dot.png`,
+                      scaledSize: new google.maps.Size(32, 32),
+                    }}
+                    onClick={() => setSelectedLocation(location)}
+                  />
+                );
+              })}
 
             {selectedLocation && (
               <InfoWindow
@@ -669,7 +670,7 @@ export default function Dashboard() {
                     selectedLocation.photos.length > 0 && (
                       <div className="flex gap-2 mb-3 overflow-x-auto">
                         {selectedLocation.photos.map((photo, i) => (
-                          <img
+                          <Image
                             key={i}
                             src={photo}
                             alt={`${selectedLocation.name} photo ${i + 1}`}
