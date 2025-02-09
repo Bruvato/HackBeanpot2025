@@ -73,10 +73,12 @@ export default function Dashboard() {
   const [avoidTolls, setAvoidTolls] = useState(false);
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [locations, setLocations] = useState<Location[]>([]);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState(['tourist_attraction']);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const startAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const destAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const searchDebounceRef = useRef<NodeJS.Timeout>();
 
   const locationTypes = [
     { value: 'tourist_attraction', label: 'Tourist Attractions', color: 'yellow' },
@@ -160,64 +162,143 @@ export default function Dashboard() {
   const findLocations = useCallback(async (route: google.maps.DirectionsRoute) => {
     if (!map) return;
 
-    const placesService = new google.maps.places.PlacesService(map);
-    const newLocations: Location[] = [];
-    
-    // Get points along the route
-    const path = route.overview_path;
-    const numPoints = Math.min(path.length, 10);
-    const step = Math.max(1, Math.floor(path.length / numPoints));
-
-    for (let i = 0; i < path.length; i += step) {
-      const point = path[i];
-      
-      for (const type of selectedTypes) {
-        const request = {
-          location: point,
-          radius: 5000,
-          type: type
-        };
-
-        try {
-          const results = await new Promise<google.maps.places.PlaceResult[]>((resolve, reject) => {
-            placesService.nearbySearch(request, (results, status) => {
-              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                resolve(results);
-              } else {
-                reject(status);
-              }
-            });
-          });
-
-          for (const place of results) {
-            if (place.geometry?.location && place.name && place.place_id &&
-                !newLocations.some(loc => loc.placeId === place.place_id)) {
-              try {
-                const details = await getPlaceDetails(place.place_id, placesService);
-                newLocations.push({
-                  name: place.name,
-                  position: place.geometry.location,
-                  placeId: place.place_id,
-                  type: type,
-                  ...details
-                });
-              } catch (error) {
-                console.error('Error fetching place details:', error);
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Error searching for places:', error);
-        }
-      }
+    // Clear existing timeout if any
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
     }
 
-    setLocations(newLocations);
+    // Clear existing locations immediately
+    setLocations([]);
+    setIsLoadingLocations(true);
+
+    searchDebounceRef.current = setTimeout(async () => {
+      const placesService = new google.maps.places.PlacesService(map);
+      const newLocations: Location[] = [];
+      
+      // Get strategic points along the route
+      const searchPoints: google.maps.LatLng[] = [];
+      route.legs.forEach(leg => {
+        // Always include start and end of each leg
+        searchPoints.push(leg.start_location);
+        searchPoints.push(leg.end_location);
+        
+        leg.steps.forEach((step, stepIndex) => {
+          // For longer steps, add intermediate points
+          if (step.distance && step.distance.value > 1000) { // If step is longer than 1km
+            if (step.path && step.path.length > 2) {
+              // Add a point from the middle of the path
+              const midIndex = Math.floor(step.path.length / 2);
+              searchPoints.push(step.path[midIndex]);
+            }
+          }
+          
+          // Add points at major turns or route changes
+          if (stepIndex > 0) {
+            const prevStep = leg.steps[stepIndex - 1];
+            const angle = google.maps.geometry.spherical.computeHeading(
+              prevStep.end_location,
+              step.start_location
+            );
+            if (Math.abs(angle) > 30) { // If turn is greater than 30 degrees
+              searchPoints.push(step.start_location);
+            }
+          }
+        });
+      });
+
+      // Use a Map to efficiently track covered areas
+      const coveredAreas = new Map<string, boolean>();
+      const gridSize = 1000; // 1km grid
+
+      const getGridKey = (lat: number, lng: number) => {
+        return `${Math.floor(lat * gridSize) / gridSize},${Math.floor(lng * gridSize) / gridSize}`;
+      };
+
+      const filteredPoints = searchPoints.filter(point => {
+        const key = getGridKey(point.lat(), point.lng());
+        if (coveredAreas.has(key)) {
+          return false;
+        }
+        coveredAreas.set(key, true);
+        return true;
+      });
+
+      const searchPromises: Promise<void>[] = [];
+      const processedPlaces = new Set<string>(); // Track processed place IDs
+
+      for (const point of filteredPoints) {
+        for (const type of selectedTypes) {
+          const searchPromise = (async () => {
+            const request = {
+              location: point,
+              radius: 1000, // Reduced radius since we have better point distribution
+              type: type
+            };
+
+            try {
+              const results = await new Promise<google.maps.places.PlaceResult[]>((resolve, reject) => {
+                placesService.nearbySearch(request, (results, status) => {
+                  if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                    resolve(results);
+                  } else {
+                    reject(status);
+                  }
+                });
+              });
+
+              // Process only the top 5 results per point
+              for (const place of results.slice(0, 5)) {
+                if (place.geometry?.location && place.name && place.place_id &&
+                    !processedPlaces.has(place.place_id)) {
+                  processedPlaces.add(place.place_id);
+                  try {
+                    const details = await getPlaceDetails(place.place_id, placesService);
+                    newLocations.push({
+                      name: place.name,
+                      position: place.geometry.location,
+                      placeId: place.place_id,
+                      type: type,
+                      ...details
+                    });
+                  } catch (error) {
+                    console.error('Error fetching place details:', error);
+                  }
+                }
+              }
+            } catch (error) {
+              console.error('Error searching for places:', error);
+            }
+          })();
+          searchPromises.push(searchPromise);
+        }
+      }
+
+      await Promise.all(searchPromises);
+      setLocations(newLocations);
+      setIsLoadingLocations(false);
+    }, 300); 
   }, [map, selectedTypes]);
 
   useEffect(() => {
+    // Cleanup function to clear timeout
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (directions?.routes[selectedRouteIndex]) {
+      findLocations(directions.routes[selectedRouteIndex]);
+    } else {
+      setLocations([]); 
+    }
+  }, [directions, selectedRouteIndex, selectedTypes, findLocations]);
+
+  useEffect(() => {
     if (isLoaded && start !== "Unknown Start" && destination !== "Unknown Destination") {
-      setError(null); // Clear previous errors
+      setError(null); 
       const directionsService = new google.maps.DirectionsService();
 
       directionsService.route(
@@ -292,12 +373,6 @@ export default function Dashboard() {
       );
     }
   }, [isLoaded, start, destination, map, avoidHighways, avoidTolls]);
-
-  useEffect(() => {
-    if (directions?.routes[selectedRouteIndex]) {
-      findLocations(directions.routes[selectedRouteIndex]);
-    }
-  }, [directions, selectedRouteIndex, selectedTypes, findLocations]);
 
   if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)
     throw new Error("Missing GOOGLE_MAPS_API_KEY");
