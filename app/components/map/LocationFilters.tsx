@@ -20,8 +20,10 @@ export default function LocationFilters({
 }: LocationFiltersProps) {
   return (
     <div className="space-y-2">
-      <h3 className="text-sm font-medium text-muted-foreground">Show Places:</h3>
-      <div className="flex flex-wrap gap-2">
+      <h3 className="text-sm font-medium text-muted-foreground">
+        Show Places:
+      </h3>
+      <div className="flex flex-col gap-2">
         {locationTypes.map((type) => (
           <label key={type.value} className="inline-flex items-center">
             <div

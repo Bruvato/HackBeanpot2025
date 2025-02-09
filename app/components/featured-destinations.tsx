@@ -37,7 +37,7 @@ const destinations = [
 
 export default function FeaturedDestinations() {
   return (
-    <section className="py-16 bg-background">
+    <section className="py-16">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold mb-8 text-center">
           Featured Destinations
@@ -46,7 +46,7 @@ export default function FeaturedDestinations() {
           {destinations.map((destination, index) => (
             <div
               key={index}
-              className="bg-card text-card-foreground rounded-lg shadow-md overflow-hidden"
+              className="bg-card text-card-foreground rounded-lg shadow-sm overflow-hidden"
             >
               <Image
                 src={destination.image || "/placeholder.svg"}

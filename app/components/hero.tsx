@@ -128,11 +128,12 @@ export default function Hero() {
       <div className="container mx-auto px-4 relative">
         <div className="flex items-center justify-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold ml-4 text-center text-white dark:text-gray-200 drop-shadow-lg">
-            Hop Into Your Next Adventure!
+            Plan Your Perfect Road Trip Adventure
           </h1>
         </div>
         <p className="text-xl mb-12 text-center text-white dark:text-gray-300 drop-shadow-md">
-          Leap from place to place, making unfrogettable memories along the way!
+          Discover amazing routes, attractions, and create unforgettable
+          memories
           <span className="inline-block ml-2 transform hover:scale-125 transition-transform">
             🦗
           </span>
@@ -149,28 +150,22 @@ export default function Hero() {
                     <input
                       ref={startRef}
                       type="text"
-                      placeholder="Starting Lily Pad 🌿"
+                      placeholder="🌿Start point..."
                       className="w-full px-4 py-3 text-lg"
                       required
                     />
                   </Autocomplete>
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lg opacity-50">
-                    🐸
-                  </span>
                 </div>
                 <div className="relative">
                   <Autocomplete>
                     <input
                       ref={destinationRef}
                       type="text"
-                      placeholder="Destination Pond 🌊"
+                      placeholder="🌊Destination Pond..."
                       className="w-full px-4 py-3 text-lg"
                       required
                     />
                   </Autocomplete>
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lg opacity-50">
-                    🎯
-                  </span>
                 </div>
               </div>
             )}
@@ -191,7 +186,7 @@ export default function Hero() {
               type="submit"
               className="froggy-button w-full text-lg font-semibold hover:scale-105 transition-transform"
             >
-              Hop Into It! 🐸
+              Search Routes! 🐸
             </button>
           </div>
         </form>

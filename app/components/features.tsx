@@ -60,7 +60,7 @@ export default function Features() {
           {featuresList.map((service, index) => (
             <div
               key={index}
-              className="bg-card text-card-foreground p-6 rounded-lg shadow-md text-center"
+              className="bg-card text-card-foreground p-6 rounded-lg text-center shadow-sm"
             >
               <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
               <p className="text-muted-foreground">{service.description}</p>

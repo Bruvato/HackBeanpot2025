@@ -230,11 +230,11 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="max-w-full mx-auto p-20">
+      <div className="max-w-full mx-auto py-6 px-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
           {/* Road Trip Section */}
           <div className="lg:col-span-4">
-            <div className="rounded-lg shadow-sm p-6 bg-white h-full">
+            <div className="rounded-lg shadow-sm p-6 h-full bg-card">
               <h1 className="text-2xl font-bold mb-4">Your Road Trip</h1>
               <RouteInputs
                 startInput={startInput}
@@ -291,7 +291,7 @@ export default function Dashboard() {
           <div className="lg:col-span-3">
             <div className="space-y-6">
               {/* Starting Point Weather */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="rounded-lg shadow-sm p-6 bg-card">
                 <h2 className="text-2xl font-semibold mb-4">
                   Starting Point Weather
                 </h2>
@@ -305,7 +305,7 @@ export default function Dashboard() {
               </div>
 
               {/* Destination Weather */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="rounded-lg shadow-sm p-6 bg-card">
                 <h2 className="text-2xl font-semibold mb-4">
                   Destination Weather
                 </h2>
@@ -322,7 +322,7 @@ export default function Dashboard() {
 
           {/* Packing List */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6 h-full">
+            <div className="rounded-lg shadow-sm p-6 h-full bg-card">
               <h2 className="text-2xl font-semibold mb-4">Packing List</h2>
               <PackingList startLocation={start} endLocation={destination} />
             </div>
@@ -330,7 +330,7 @@ export default function Dashboard() {
 
           {/* Spotify Playlist Generator */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-sm p-6 h-full">
+            <div className="rounded-lg shadow-sm p-6 h-full bg-card">
               <h2 className="text-2xl font-semibold mb-4">
                 Road Trip Playlist
               </h2>
@@ -359,7 +359,7 @@ export default function Dashboard() {
         </div>
 
         {/* Road Trip Bingo */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-semibold mb-4">Road Trip Bingo</h2>
           <RoadTripBingo
             locations={locations}

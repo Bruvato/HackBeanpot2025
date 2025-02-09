@@ -9,8 +9,12 @@ interface RouteInputsProps {
   avoidTolls: boolean;
   onStartInputChange: (value: string) => void;
   onDestinationInputChange: (value: string) => void;
-  onStartAutocompleteLoad: (autocomplete: google.maps.places.Autocomplete) => void;
-  onDestAutocompleteLoad: (autocomplete: google.maps.places.Autocomplete) => void;
+  onStartAutocompleteLoad: (
+    autocomplete: google.maps.places.Autocomplete
+  ) => void;
+  onDestAutocompleteLoad: (
+    autocomplete: google.maps.places.Autocomplete
+  ) => void;
   onStartPlaceChanged: () => void;
   onDestPlaceChanged: () => void;
   onAvoidHighwaysChange: (checked: boolean) => void;
@@ -35,7 +39,9 @@ export default function RouteInputs({
     <div className="mb-6 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Starting Point</label>
+          <label className="block text-sm font-medium mb-1">
+            Starting Point
+          </label>
           <Autocomplete
             onLoad={onStartAutocompleteLoad}
             onPlaceChanged={onStartPlaceChanged}
@@ -47,7 +53,7 @@ export default function RouteInputs({
               value={startInput}
               onChange={(e) => onStartInputChange(e.target.value)}
               required
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md bg-white"
             />
           </Autocomplete>
         </div>
@@ -64,7 +70,7 @@ export default function RouteInputs({
               value={destinationInput}
               onChange={(e) => onDestinationInputChange(e.target.value)}
               required
-              className="w-full p-2 border rounded-md"
+              className="w-full p-2 border rounded-md bg-white"
             />
           </Autocomplete>
         </div>

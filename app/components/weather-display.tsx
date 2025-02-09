@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 interface WeatherDisplayProps {
   lat: number;
@@ -14,7 +14,9 @@ interface WeatherData {
 }
 
 // Weather codes mapping based on WMO standards
-const weatherDescriptions: { [key: number]: { description: string; icon: string } } = {
+const weatherDescriptions: {
+  [key: number]: { description: string; icon: string };
+} = {
   0: { description: "Clear sky", icon: "☀️" },
   1: { description: "Mainly clear", icon: "🌤️" },
   2: { description: "Partly cloudy", icon: "⛅" },
@@ -41,7 +43,11 @@ const weatherDescriptions: { [key: number]: { description: string; icon: string 
   99: { description: "Thunderstorm with heavy hail", icon: "⛈️" },
 };
 
-export default function WeatherDisplay({ lat, lng, locationName }: WeatherDisplayProps) {
+export default function WeatherDisplay({
+  lat,
+  lng,
+  locationName,
+}: WeatherDisplayProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,25 +55,28 @@ export default function WeatherDisplay({ lat, lng, locationName }: WeatherDispla
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        console.log(`Fetching weather for ${locationName} at coordinates:`, { lat, lng });
-        
-        if (typeof lat !== 'number' || typeof lng !== 'number') {
+        console.log(`Fetching weather for ${locationName} at coordinates:`, {
+          lat,
+          lng,
+        });
+
+        if (typeof lat !== "number" || typeof lng !== "number") {
           throw new Error(`Invalid coordinates: lat=${lat}, lng=${lng}`);
         }
 
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current_weather=true&temperature_unit=fahrenheit`;
-        console.log('Fetching from URL:', url);
+        console.log("Fetching from URL:", url);
 
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        console.log('Weather data received:', data);
-        
+        console.log("Weather data received:", data);
+
         if (!data.current_weather) {
-          throw new Error('No weather data in response');
+          throw new Error("No weather data in response");
         }
 
         setWeather({
@@ -77,8 +86,12 @@ export default function WeatherDisplay({ lat, lng, locationName }: WeatherDispla
         });
         setError(null);
       } catch (error) {
-        console.error('Error fetching weather:', error);
-        setError(error instanceof Error ? error.message : 'Failed to fetch weather data');
+        console.error("Error fetching weather:", error);
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch weather data"
+        );
       } finally {
         setLoading(false);
       }
@@ -109,22 +122,28 @@ export default function WeatherDisplay({ lat, lng, locationName }: WeatherDispla
 
   if (!weather) return null;
 
-  const weatherInfo = weatherDescriptions[weather.weatherCode] || { 
-    description: "Unknown", 
-    icon: "❓" 
+  const weatherInfo = weatherDescriptions[weather.weatherCode] || {
+    description: "Unknown",
+    icon: "❓",
   };
 
   return (
-    <div className="bg-white/90 rounded-lg p-4 shadow-sm">
+    <div className="rounded-lg p-4 shadow-sm">
       <h3 className="font-medium text-lg">Weather in {locationName}</h3>
       <div className="flex items-center gap-4">
-        <span className="text-4xl" role="img" aria-label={weatherInfo.description}>
+        <span
+          className="text-4xl"
+          role="img"
+          aria-label={weatherInfo.description}
+        >
           {weatherInfo.icon}
         </span>
         <div>
           <p className="text-2xl font-bold">{weather.temperature}°F</p>
-          <p className="text-gray-600">{weatherInfo.description}</p>
-          <p className="text-sm text-gray-500">Wind: {weather.windspeed} mph</p>
+          <p className="text-muted-foreground">{weatherInfo.description}</p>
+          <p className="text-sm text-muted-foreground">
+            Wind: {weather.windspeed} mph
+          </p>
         </div>
       </div>
     </div>

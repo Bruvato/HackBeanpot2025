@@ -21,7 +21,7 @@ export default function RouteInfo({
         <div
           key={index}
           onClick={() => onRouteSelect(index)}
-          className={`p-3 rounded-md cursor-pointer transition-all duration-200 hover:bg-blue-50
+          className={`p-3 rounded-sm cursor-pointer transition-all duration-200 hover:bg-blue-50
           ${
             index === selectedRouteIndex
               ? "bg-blue-100 border-l-4 border-blue-500 shadow-sm"

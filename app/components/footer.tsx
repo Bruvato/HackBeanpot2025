@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-wrap justify-between">
           <div className="w-full md:w-1/4 mb-6 md:mb-0">
-            <h3 className="text-xl font-semibold mb-4">RoadTrippr</h3>
+            <h3 className="text-xl font-semibold mb-4">RoadToad</h3>
             <p className="text-muted-foreground">
               Plan your perfect road trip adventure with ease.
             </p>
@@ -19,7 +19,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/plan"
+                  href="/"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Plan a Trip
@@ -27,7 +27,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/destinations"
+                  href="/"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Destinations
@@ -35,7 +35,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/about"
+                  href="/"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   About Us
@@ -43,7 +43,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/contact"
+                  href="/"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Contact
@@ -92,7 +92,7 @@ export default function Footer() {
         </div>
         <div className="mt-8 text-center text-muted-foreground">
           <p>
-            &copy; {new Date().getFullYear()} RoadTrippr. All rights reserved.
+            &copy; {new Date().getFullYear()} RoadToad. All rights reserved.
           </p>
         </div>
       </div>

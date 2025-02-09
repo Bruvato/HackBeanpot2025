@@ -134,7 +134,7 @@ export default function RoadTripBingo({
     <div className="w-full max-w-4xl mx-auto px-4">
       {hasWon && (
         <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-lg text-center text-lg font-bold animate-bounce">
-          🐸 BINGO! Ribbit! 🐸
+          🐸 BINGO! 🐸
         </div>
       )}
 
@@ -167,11 +167,13 @@ export default function RoadTripBingo({
               }
               leading-tight font-medium
               transform hover:scale-105 hover:-rotate-1
-              shadow-md hover:shadow-lg
+              shadow-sm hover:shadow-lg
             `}
           >
             {square.text}
-            {square.isMarked && <span className="absolute text-xs mt-8">🐸</span>}
+            {square.isMarked && (
+              <span className="absolute text-xs mt-8">🐸</span>
+            )}
           </button>
         ))}
       </div>

@@ -81,9 +81,8 @@ const PackingList = ({
   }, [startLocation, endLocation]);
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="rounded-lg shadow-sm p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Packing List</h2>
         <button
           onClick={generateList}
           disabled={
@@ -95,7 +94,7 @@ const PackingList = ({
           }
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
         >
-          {loading ? "Generating..." : "Refresh List"}
+          {loading ? "Generating..." : "Refresh"}
         </button>
       </div>
 

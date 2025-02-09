@@ -13,36 +13,27 @@ export default function Header() {
         <nav className="flex items-center space-x-4">
           <ul className="flex space-x-4">
             <li>
-              <Link href="/plan" className="text-foreground hover:text-primary">
+              <Link href="/" className="text-foreground hover:text-primary">
                 Plan a Trip
               </Link>
             </li>
             <li>
-              <Link
-                href="/destinations"
-                className="text-foreground hover:text-primary"
-              >
+              <Link href="/" className="text-foreground hover:text-primary">
                 Destinations
               </Link>
             </li>
             <li>
-              <Link
-                href="/about"
-                className="text-foreground hover:text-primary"
-              >
+              <Link href="/" className="text-foreground hover:text-primary">
                 About
               </Link>
             </li>
             <li>
-              <Link
-                href="/contact"
-                className="text-foreground hover:text-primary"
-              >
+              <Link href="/" className="text-foreground hover:text-primary">
                 Contact
               </Link>
             </li>
           </ul>
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
         </nav>
       </div>
     </header>
