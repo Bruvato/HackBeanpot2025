@@ -3,33 +3,35 @@ import Image from "next/image";
 const destinations = [
   {
     name: "Pacific Coast Highway",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/destinations/pacificCoastHighway.jpg",
     description: "Scenic coastal drive from San Francisco to Los Angeles",
   },
   {
     name: "Route 66",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/destinations/route66.webp",
     description: "Historic route from Chicago to Santa Monica",
   },
   {
     name: "Blue Ridge Parkway",
-    image: "/placeholder.svg?height=200&width=300",
+    image: "/destinations/blueRidgeHighway.jpg",
     description: "Stunning mountain views in Virginia and North Carolina",
   },
   {
-    name: "Blue Ridge Parkway",
-    image: "/placeholder.svg?height=200&width=300",
-    description: "Stunning mountain views in Virginia and North Carolina",
+    name: "Great River Road",
+    image: "/destinations/greatRiverRoad.jpg",
+    description: "Follows the Mississippi River from Minnesota to Louisiana",
   },
   {
-    name: "Blue Ridge Parkway",
-    image: "/placeholder.svg?height=200&width=300",
-    description: "Stunning mountain views in Virginia and North Carolina",
+    name: "Overseas Highway",
+    image: "/destinations/overseasHighway.jpg",
+    description:
+      "Island-hopping drive through the Florida Keys on U.S. Route 1",
   },
   {
-    name: "Blue Ridge Parkway",
-    image: "/placeholder.svg?height=200&width=300",
-    description: "Stunning mountain views in Virginia and North Carolina",
+    name: "Going-to-the-Sun Road",
+    image: "/destinations/goingToTheSunRoad.jpg",
+    description:
+      "Breathtaking mountain pass through Glacier National Park in Montana",
   },
 ];
 
