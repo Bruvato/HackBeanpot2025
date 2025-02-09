@@ -8,7 +8,7 @@ export default function Header() {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <TbMapPin className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold text-primary">RoadTrippr</span>
+          <span className="text-xl font-bold text-primary">RoadToad</span>
         </Link>
         <nav className="flex items-center space-x-4">
           <ul className="flex space-x-4">
