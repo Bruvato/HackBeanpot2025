@@ -42,10 +42,10 @@ export const getPlaceDetails = async (
 
           if (
             place.editorial_summary &&
-            'overview' in place.editorial_summary &&
+            "overview" in place.editorial_summary &&
             place.editorial_summary.overview
           ) {
-            details.description = (place.editorial_summary as any)?.overview;
+            details.description = place.editorial_summary.overview;
           }
 
           if (place.formatted_address) {
