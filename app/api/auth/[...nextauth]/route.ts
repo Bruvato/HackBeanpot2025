@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 import { JWT } from "next-auth/jwt";
 import { Session, Account } from "next-auth";
@@ -72,7 +72,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
   }
 }
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID!,
