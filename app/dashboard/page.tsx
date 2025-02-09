@@ -177,34 +177,54 @@ export default function Dashboard() {
 
   const getPlaceDetails = async (
     placeId: string,
-    placesService: google.maps.places.PlacesService
-  ) => {
-    return new Promise<Partial<Location>>((resolve, reject) => {
-      placesService.getDetails(
+    service: google.maps.places.PlacesService
+  ): Promise<{
+    rating?: number;
+    photos?: string[];
+    description?: string;
+    address?: string;
+  }> => {
+    return new Promise((resolve, reject) => {
+      service.getDetails(
         {
           placeId: placeId,
           fields: [
-            "formatted_address",
+            "rating",
             "photos",
             "editorial_summary",
-            "rating",
-            "reviews",
+            "formatted_address",
           ],
         },
-        (place, status) => {
+        (place: google.maps.places.PlaceResult | null, status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-            const photos = place.photos
-              ?.slice(0, 3)
-              .map((photo) => photo.getUrl({ maxWidth: 400, maxHeight: 300 }));
-            resolve({
-              photos,
-              description:
-                (place as ExtendedPlaceResult).editorial_summary?.overview ||
-                place.reviews?.[0]?.text?.slice(0, 150) + "..." ||
-                "No description available",
-              address: place.formatted_address,
-              rating: place.rating,
-            });
+            const details: {
+              rating?: number;
+              photos?: string[];
+              description?: string;
+              address?: string;
+            } = {};
+
+            if (place.rating) {
+              details.rating = place.rating;
+            }
+
+            if (place.photos) {
+              details.photos = place.photos
+                .slice(0, 3)
+                .map((photo) =>
+                  photo.getUrl({ maxWidth: 400, maxHeight: 300 })
+                );
+            }
+
+            if (place.editorial_summary?.overview) {
+              details.description = place.editorial_summary.overview;
+            }
+
+            if (place.formatted_address) {
+              details.address = place.formatted_address;
+            }
+
+            resolve(details);
           } else {
             reject(status);
           }
@@ -682,12 +702,14 @@ export default function Dashboard() {
                     {selectedLocation.photos &&
                       selectedLocation.photos.length > 0 && (
                         <div className="flex gap-2 mb-3 overflow-x-auto">
-                          {selectedLocation.photos.map((photo, i) => (
-                            <Image
+                          {selectedLocation.photos.map((photoUrl, i) => (
+                            <img
                               key={i}
-                              src={photo}
+                              src={photoUrl}
                               alt={`${selectedLocation.name} photo ${i + 1}`}
                               className="h-32 w-auto object-cover rounded"
+                              width={400}
+                              height={300}
                             />
                           ))}
                         </div>
