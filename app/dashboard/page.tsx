@@ -1,24 +1,35 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
-import { useEffect, useState, useCallback, useRef } from 'react';
-import { GoogleMap, useLoadScript, DirectionsService, DirectionsRenderer, Libraries, Autocomplete, Marker, InfoWindow } from "@react-google-maps/api";
+import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  GoogleMap,
+  useLoadScript,
+  DirectionsService,
+  DirectionsRenderer,
+  Libraries,
+  Autocomplete,
+  Marker,
+  InfoWindow,
+} from "@react-google-maps/api";
 import { Input } from "../components/ui/input";
+import Header from "../components/header";
+import Footer from "../components/footer";
 
 const mapContainerStyle = {
-  width: '100%',
-  height: '60vh'
+  width: "100%",
+  height: "60vh",
 };
 
 const center = {
   lat: 42.3601,
-  lng: -71.0589
+  lng: -71.0589,
 };
 
 const libraries: Libraries = ["places"];
 
 const mapOptions = {
-  mapTypeId: 'roadmap',
+  mapTypeId: "roadmap",
   tilt: 45,
   heading: 0,
   mapTypeControl: true,
@@ -30,8 +41,8 @@ const mapOptions = {
   minZoom: 3,
   maxZoom: 20,
   mapTypeControlOptions: {
-    mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain'],
-  }
+    mapTypeIds: ["roadmap", "satellite", "hybrid", "terrain"],
+  },
 };
 
 interface RouteInfo {
@@ -61,12 +72,19 @@ interface ExtendedPlaceResult extends google.maps.places.PlaceResult {
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const [startInput, setStartInput] = useState(searchParams.get("start") || "");
-  const [destinationInput, setDestinationInput] = useState(searchParams.get("destination") || "");
-  const [start, setStart] = useState(searchParams.get("start") || "Unknown Start");
-  const [destination, setDestination] = useState(searchParams.get("destination") || "Unknown Destination");
+  const [destinationInput, setDestinationInput] = useState(
+    searchParams.get("destination") || ""
+  );
+  const [start, setStart] = useState(
+    searchParams.get("start") || "Unknown Start"
+  );
+  const [destination, setDestination] = useState(
+    searchParams.get("destination") || "Unknown Destination"
+  );
   const date = searchParams.get("date") || "Not Specified";
 
-  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+  const [directions, setDirections] =
+    useState<google.maps.DirectionsResult | null>(null);
   const [routeInfos, setRouteInfos] = useState<RouteInfo[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [avoidHighways, setAvoidHighways] = useState(false);
@@ -81,22 +99,26 @@ export default function Dashboard() {
   const searchDebounceRef = useRef<NodeJS.Timeout>();
 
   const locationTypes = [
-    { value: 'tourist_attraction', label: 'Tourist Attractions', color: 'yellow' },
-    { value: 'restaurant', label: 'Restaurants', color: 'red' },
-    { value: 'park', label: 'Parks', color: 'green' },
-    { value: 'museum', label: 'Museums', color: 'purple' },
-    { value: 'shopping_mall', label: 'Shopping', color: 'blue' }
+    {
+      value: "tourist_attraction",
+      label: "Tourist Attractions",
+      color: "yellow",
+    },
+    { value: "restaurant", label: "Restaurants", color: "red" },
+    { value: "park", label: "Parks", color: "green" },
+    { value: "museum", label: "Museums", color: "purple" },
+    { value: "shopping_mall", label: "Shopping", color: "blue" },
   ];
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
     libraries,
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
   const onLoad = useCallback(function callback(map: google.maps.Map) {
-    map.setMapTypeId('roadmap');
+    map.setMapTypeId("roadmap");
     map.setZoom(12);
     setMap(map);
   }, []);
@@ -105,11 +127,15 @@ export default function Dashboard() {
     setMap(null);
   }, []);
 
-  const onStartAutocompleteLoad = (autocomplete: google.maps.places.Autocomplete) => {
+  const onStartAutocompleteLoad = (
+    autocomplete: google.maps.places.Autocomplete
+  ) => {
     startAutocompleteRef.current = autocomplete;
   };
 
-  const onDestAutocompleteLoad = (autocomplete: google.maps.places.Autocomplete) => {
+  const onDestAutocompleteLoad = (
+    autocomplete: google.maps.places.Autocomplete
+  ) => {
     destAutocompleteRef.current = autocomplete;
   };
 
@@ -133,23 +159,35 @@ export default function Dashboard() {
     }
   };
 
-  const getPlaceDetails = async (placeId: string, placesService: google.maps.places.PlacesService) => {
+  const getPlaceDetails = async (
+    placeId: string,
+    placesService: google.maps.places.PlacesService
+  ) => {
     return new Promise<Partial<Location>>((resolve, reject) => {
       placesService.getDetails(
         {
           placeId: placeId,
-          fields: ['formatted_address', 'photos', 'editorial_summary', 'rating', 'reviews']
+          fields: [
+            "formatted_address",
+            "photos",
+            "editorial_summary",
+            "rating",
+            "reviews",
+          ],
         },
         (place, status) => {
           if (status === google.maps.places.PlacesServiceStatus.OK && place) {
-            const photos = place.photos?.slice(0, 3).map(photo => photo.getUrl({ maxWidth: 400, maxHeight: 300 }));
+            const photos = place.photos
+              ?.slice(0, 3)
+              .map((photo) => photo.getUrl({ maxWidth: 400, maxHeight: 300 }));
             resolve({
               photos,
-              description: (place as ExtendedPlaceResult).editorial_summary?.overview || 
-                         (place.reviews?.[0]?.text?.slice(0, 150) + "...") ||
-                         "No description available",
+              description:
+                (place as ExtendedPlaceResult).editorial_summary?.overview ||
+                place.reviews?.[0]?.text?.slice(0, 150) + "..." ||
+                "No description available",
               address: place.formatted_address,
-              rating: place.rating
+              rating: place.rating,
             });
           } else {
             reject(status);
@@ -159,8 +197,9 @@ export default function Dashboard() {
     });
   };
 
-  const findLocations = useCallback(async (route: google.maps.DirectionsRoute) => {
-    if (!map) return;
+  const findLocations = useCallback(
+    async (route: google.maps.DirectionsRoute) => {
+      if (!map) return;
 
     // Clear existing timeout if any
     if (searchDebounceRef.current) {
@@ -323,7 +362,7 @@ export default function Dashboard() {
                 return {
                   distance: leg.distance?.text || "Unknown",
                   duration: leg.duration?.text || "Unknown",
-                  index
+                  index,
                 };
               });
               setRouteInfos(infos);
@@ -332,20 +371,22 @@ export default function Dashboard() {
             // Adjust the map view to show the route
             if (map && result.routes[0]) {
               const bounds = new google.maps.LatLngBounds();
-              result.routes[0].legs.forEach(leg => {
+              result.routes[0].legs.forEach((leg) => {
                 bounds.extend(leg.start_location);
                 bounds.extend(leg.end_location);
               });
               map.fitBounds(bounds);
             }
           } else {
-            let errorMessage = "Could not find directions between these locations. ";
+            let errorMessage =
+              "Could not find directions between these locations. ";
             switch (status) {
               case google.maps.DirectionsStatus.NOT_FOUND:
                 errorMessage += "One or both locations could not be found.";
                 break;
               case google.maps.DirectionsStatus.ZERO_RESULTS:
-                errorMessage += "No route could be found between these locations.";
+                errorMessage +=
+                  "No route could be found between these locations.";
                 break;
               case google.maps.DirectionsStatus.MAX_WAYPOINTS_EXCEEDED:
                 errorMessage += "Too many waypoints provided.";
@@ -357,7 +398,8 @@ export default function Dashboard() {
                 errorMessage += "Too many requests. Please try again later.";
                 break;
               case google.maps.DirectionsStatus.REQUEST_DENIED:
-                errorMessage += "Request was denied. Please check your API key.";
+                errorMessage +=
+                  "Request was denied. Please check your API key.";
                 break;
               case google.maps.DirectionsStatus.UNKNOWN_ERROR:
                 errorMessage += "An unknown error occurred. Please try again.";
@@ -378,19 +420,22 @@ export default function Dashboard() {
     throw new Error("Missing GOOGLE_MAPS_API_KEY");
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen flex flex-col">
+      <Header />
       <div className="max-w-7xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Your Road Trip</h1>
-          
+        <div className="rounded-lg shadow-sm p-6 mb-6 text-card-foreground">
+          <h1 className="text-2xl font-bold mb-4">Your Road Trip</h1>
+
           <div className="mb-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Starting Point</label>
+                <label className="block text-sm font-medium mb-1 text-muted-foreground">
+                  Starting Point
+                </label>
                 <Autocomplete
                   onLoad={onStartAutocompleteLoad}
                   onPlaceChanged={onStartPlaceChanged}
-                  options={{ types: ['geocode'] }}
+                  options={{ types: ["geocode"] }}
                 >
                   <input
                     type="text"
@@ -403,11 +448,13 @@ export default function Dashboard() {
                 </Autocomplete>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Destination</label>
+                <label className="block text-sm font-medium mb-1 text-muted-foreground">
+                  Destination
+                </label>
                 <Autocomplete
                   onLoad={onDestAutocompleteLoad}
                   onPlaceChanged={onDestPlaceChanged}
-                  options={{ types: ['geocode'] }}
+                  options={{ types: ["geocode"] }}
                 >
                   <input
                     type="text"
@@ -429,7 +476,7 @@ export default function Dashboard() {
                   onChange={(e) => setAvoidHighways(e.target.checked)}
                   className="form-checkbox h-4 w-4 text-blue-600"
                 />
-                <span className="text-gray-700">Avoid Highways</span>
+                <span className="text-muted-foreground">Avoid Highways</span>
               </label>
               <label className="flex items-center space-x-2">
                 <input
@@ -438,56 +485,81 @@ export default function Dashboard() {
                   onChange={(e) => setAvoidTolls(e.target.checked)}
                   className="form-checkbox h-4 w-4 text-blue-600"
                 />
-                <span className="text-gray-700">Avoid Tolls</span>
+                <span className="text-muted-foreground">Avoid Tolls</span>
               </label>
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-sm font-medium text-gray-700">Show Places:</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Show Places:
+              </h3>
               <div className="flex flex-wrap gap-2">
-                {locationTypes.map(type => (
+                {locationTypes.map((type) => (
                   <label key={type.value} className="inline-flex items-center">
                     <input
                       type="checkbox"
                       checked={selectedTypes.includes(type.value)}
                       onChange={(e) => {
-                        setSelectedTypes(prev => 
+                        setSelectedTypes((prev) =>
                           e.target.checked
                             ? [...prev, type.value]
-                            : prev.filter(t => t !== type.value)
+                            : prev.filter((t) => t !== type.value)
                         );
                       }}
                       className="form-checkbox h-4 w-4"
                     />
-                    <span className="ml-2 text-sm text-gray-700">{type.label}</span>
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      {type.label}
+                    </span>
                   </label>
                 ))}
               </div>
             </div>
 
-            <p className="text-gray-600">From: <span className="font-medium text-gray-900">{start}</span></p>
-            <p className="text-gray-600">To: <span className="font-medium text-gray-900">{destination}</span></p>
-            <p className="text-gray-600">Date: <span className="font-medium text-gray-900">{date}</span></p>
-            
+            <p className="text-muted-foreground">
+              From:{" "}
+              <span className="font-medium text-card-foreground">{start}</span>
+            </p>
+            <p className="text-muted-foreground">
+              To:{" "}
+              <span className="font-medium text-card-foreground">
+                {destination}
+              </span>
+            </p>
+            <p className="text-muted-foreground">
+              Date:{" "}
+              <span className="font-medium text-card-foreground">{date}</span>
+            </p>
+
             {routeInfos.length > 0 && (
               <div className="mt-4 space-y-2">
-                <h3 className="text-lg font-semibold text-gray-800">Available Routes:</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Available Routes:
+                </h3>
                 {routeInfos.map((info, index) => (
-                  <div 
-                    key={index} 
+                  <div
+                    key={index}
                     onClick={() => setSelectedRouteIndex(index)}
                     className={`p-3 rounded-md cursor-pointer transition-all duration-200 hover:bg-blue-50
-                      ${index === selectedRouteIndex ? 'bg-blue-100 border-l-4 border-blue-500 shadow-sm' : 'bg-gray-50 border-l-4 border-gray-300'}`}
+                      ${
+                        index === selectedRouteIndex
+                          ? "bg-blue-100 border-l-4 border-blue-500 shadow-sm"
+                          : "bg-gray-50 border-l-4 border-gray-300"
+                      }`}
                   >
                     <p className="font-medium text-gray-900">
                       Route {index + 1} {index === 0 && "(Fastest)"}
                     </p>
                     <div className="mt-1 text-sm">
                       <span className="text-gray-600">Distance: </span>
-                      <span className="font-medium text-gray-900">{info.distance}</span>
+                      <span className="font-medium text-gray-900">
+                        {info.distance}
+                      </span>
                       <span className="mx-2">•</span>
                       <span className="text-gray-600">Duration: </span>
-                      <span className="font-medium text-gray-900">{info.duration}</span>
+                      <span className="font-medium text-gray-900">
+                        {info.duration}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -519,16 +591,17 @@ export default function Dashboard() {
                     key={index}
                     directions={{
                       ...directions,
-                      routes: [route]
+                      routes: [route],
                     }}
                     options={{
                       polylineOptions: {
-                        strokeColor: index === selectedRouteIndex ? '#4285F4' : '#45B6FE',
+                        strokeColor:
+                          index === selectedRouteIndex ? "#4285F4" : "#45B6FE",
                         strokeWeight: index === selectedRouteIndex ? 5 : 3,
-                        strokeOpacity: index === selectedRouteIndex ? 1 : 0.6
+                        strokeOpacity: index === selectedRouteIndex ? 1 : 0.6,
                       },
                       suppressMarkers: false,
-                      preserveViewport: true
+                      preserveViewport: true,
                     }}
                   />
                 ))}
@@ -536,15 +609,19 @@ export default function Dashboard() {
             )}
 
             {locations.map((location, index) => {
-              const locationType = locationTypes.find(t => t.value === location.type);
+              const locationType = locationTypes.find(
+                (t) => t.value === location.type
+              );
               return (
                 <Marker
                   key={`location-${index}`}
                   position={location.position}
                   title={location.name}
                   icon={{
-                    url: `http://maps.google.com/mapfiles/ms/icons/${locationType?.color || 'red'}-dot.png`,
-                    scaledSize: new google.maps.Size(32, 32)
+                    url: `http://maps.google.com/mapfiles/ms/icons/${
+                      locationType?.color || "red"
+                    }-dot.png`,
+                    scaledSize: new google.maps.Size(32, 32),
                   }}
                   onClick={() => setSelectedLocation(location)}
                 />
@@ -557,33 +634,36 @@ export default function Dashboard() {
                 onCloseClick={() => setSelectedLocation(null)}
               >
                 <div className="max-w-sm p-2">
-                  <h3 className="text-lg font-semibold mb-2">{selectedLocation.name}</h3>
-                  
-                  {selectedLocation.photos && selectedLocation.photos.length > 0 && (
-                    <div className="flex gap-2 mb-3 overflow-x-auto">
-                      {selectedLocation.photos.map((photo, i) => (
-                        <img
-                          key={i}
-                          src={photo}
-                          alt={`${selectedLocation.name} photo ${i + 1}`}
-                          className="h-32 w-auto object-cover rounded"
-                        />
-                      ))}
-                    </div>
-                  )}
-                  
+                  <h3 className="text-lg font-semibold mb-2">
+                    {selectedLocation.name}
+                  </h3>
+
+                  {selectedLocation.photos &&
+                    selectedLocation.photos.length > 0 && (
+                      <div className="flex gap-2 mb-3 overflow-x-auto">
+                        {selectedLocation.photos.map((photo, i) => (
+                          <img
+                            key={i}
+                            src={photo}
+                            alt={`${selectedLocation.name} photo ${i + 1}`}
+                            className="h-32 w-auto object-cover rounded"
+                          />
+                        ))}
+                      </div>
+                    )}
+
                   {selectedLocation.description && (
                     <p className="text-sm text-gray-600 mb-2">
                       {selectedLocation.description}
                     </p>
                   )}
-                  
+
                   {selectedLocation.address && (
                     <p className="text-sm text-gray-500 mb-2">
                       📍 {selectedLocation.address}
                     </p>
                   )}
-                  
+
                   {selectedLocation.rating && (
                     <p className="text-sm font-medium">
                       Rating: {selectedLocation.rating} ⭐
@@ -593,15 +673,21 @@ export default function Dashboard() {
               </InfoWindow>
             )}
           </GoogleMap>
-        ) : <div>Loading...</div>}
+        ) : (
+          <div>Loading...</div>
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-semibold mb-4">Create Your Road Trip Playlist</h2>
+        <div className="rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-semibold mb-4">
+            Create Your Road Trip Playlist
+          </h2>
           <PlaylistGenerator startLocation={start} endLocation={destination} />
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
