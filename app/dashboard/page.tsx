@@ -3,16 +3,7 @@ import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
 
 import { APIProvider, Map, limitTiltRange } from "@vis.gl/react-google-maps";
-
-import DeckGL from "@deck.gl/react";
-import { MapViewState } from "@deck.gl/core";
-import { LineLayer } from "@deck.gl/layers";
-
-const INITIAL_VIEW_STATE: MapViewState = {
-  longitude: -122.41669,
-  latitude: 37.7853,
-  zoom: 13,
-};
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
 
 type DataType = {
   from: [longitude: number, latitude: number];
@@ -27,15 +18,6 @@ export default function Dashboard() {
 
   if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)
     throw new Error("Missing GOOGLE_MAPS_API_KEY");
-
-  const layers = [
-    new LineLayer<DataType>({
-      id: "line-layer",
-      data: "/path/to/data.json",
-      getSourcePosition: (d: DataType) => d.from,
-      getTargetPosition: (d: DataType) => d.to,
-    }),
-  ];
 
   return (
     <div className="p-6">
