@@ -230,111 +230,142 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-2xl font-bold mb-4">Your Road Trip</h1>
+      <div className="max-w-full mx-auto p-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+          {/* Road Trip Section */}
+          <div className="lg:col-span-4">
+            <div className="rounded-lg shadow-sm p-6 bg-white h-full">
+              <h1 className="text-2xl font-bold mb-4">Your Road Trip</h1>
+              <RouteInputs
+                startInput={startInput}
+                destinationInput={destinationInput}
+                avoidHighways={avoidHighways}
+                avoidTolls={avoidTolls}
+                onStartInputChange={setStartInput}
+                onDestinationInputChange={setDestinationInput}
+                onStartAutocompleteLoad={onStartAutocompleteLoad}
+                onDestAutocompleteLoad={onDestAutocompleteLoad}
+                onStartPlaceChanged={onStartPlaceChanged}
+                onDestPlaceChanged={onDestPlaceChanged}
+                onAvoidHighwaysChange={setAvoidHighways}
+                onAvoidTollsChange={setAvoidTolls}
+              />
 
-          <RouteInputs
-            startInput={startInput}
-            destinationInput={destinationInput}
-            avoidHighways={avoidHighways}
-            avoidTolls={avoidTolls}
-            onStartInputChange={setStartInput}
-            onDestinationInputChange={setDestinationInput}
-            onStartAutocompleteLoad={onStartAutocompleteLoad}
-            onDestAutocompleteLoad={onDestAutocompleteLoad}
-            onStartPlaceChanged={onStartPlaceChanged}
-            onDestPlaceChanged={onDestPlaceChanged}
-            onAvoidHighwaysChange={setAvoidHighways}
-            onAvoidTollsChange={setAvoidTolls}
-          />
+              <LocationFilters
+                locationTypes={locationTypes}
+                selectedTypes={selectedTypes}
+                onTypeToggle={(type, checked) => {
+                  setSelectedTypes((prev) =>
+                    checked ? [...prev, type] : prev.filter((t) => t !== type)
+                  );
+                }}
+              />
 
-          <LocationFilters
-            locationTypes={locationTypes}
-            selectedTypes={selectedTypes}
-            onTypeToggle={(type, checked) => {
-              setSelectedTypes((prev) =>
-                checked ? [...prev, type] : prev.filter((t) => t !== type)
-              );
-            }}
-          />
+              <div className="mt-4">
+                <p className="">
+                  From: <span className="font-medium">{start}</span>
+                </p>
+                <p className="">
+                  To: <span className="font-medium">{destination}</span>
+                </p>
+                <p className="">
+                  Date: <span className="font-medium">{date}</span>
+                </p>
+              </div>
 
-          <div className="mt-4">
-            <p className="">
-              From: <span className="font-medium">{start}</span>
-            </p>
-            <p className="">
-              To: <span className="font-medium">{destination}</span>
-            </p>
-            <p className="">
-              Date: <span className="font-medium">{date}</span>
-            </p>
-          </div>
+              <RouteInfo
+                routeInfos={routeInfos}
+                selectedRouteIndex={selectedRouteIndex}
+                onRouteSelect={setSelectedRouteIndex}
+              />
 
-          <RouteInfo
-            routeInfos={routeInfos}
-            selectedRouteIndex={selectedRouteIndex}
-            onRouteSelect={setSelectedRouteIndex}
-          />
-
-          {error && (
-            <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md">
-              {error}
+              {error && (
+                <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md">
+                  {error}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      <MapComponent
-        isLoaded={isLoaded}
-        directions={directions}
-        locations={locations}
-        selectedRouteIndex={selectedRouteIndex}
-        locationTypes={locationTypes}
-        onMapLoad={setMap}
-        onMapUnmount={() => setMap(null)}
-        isLoadingLocations={isLoadingLocations}
-      />
+          {/* Weather Display */}
+          <div className="lg:col-span-3">
+            <div className="space-y-6">
+              {/* Starting Point Weather */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-2xl font-semibold mb-4">
+                  Starting Point Weather
+                </h2>
+                {directions?.routes[0]?.legs[0] && (
+                  <WeatherDisplay
+                    lat={directions.routes[0].legs[0].start_location.lat()}
+                    lng={directions.routes[0].legs[0].start_location.lng()}
+                    locationName={directions.routes[0].legs[0].start_address}
+                  />
+                )}
+              </div>
 
-      {directions?.routes[0]?.legs[0] && (
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <WeatherDisplay
-            lat={directions.routes[0].legs[0].start_location.lat()}
-            lng={directions.routes[0].legs[0].start_location.lng()}
-            locationName={directions.routes[0].legs[0].start_address}
-          />
-          <WeatherDisplay
-            lat={directions.routes[0].legs[0].end_location.lat()}
-            lng={directions.routes[0].legs[0].end_location.lng()}
-            locationName={directions.routes[0].legs[0].end_address}
-          />
-        </div>
-      )}
+              {/* Destination Weather */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-2xl font-semibold mb-4">
+                  Destination Weather
+                </h2>
+                {directions?.routes[0]?.legs[0] && (
+                  <WeatherDisplay
+                    lat={directions.routes[0].legs[0].end_location.lat()}
+                    lng={directions.routes[0].legs[0].end_location.lng()}
+                    locationName={directions.routes[0].legs[0].end_address}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
 
-      <div className="mt-6 bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-2xl font-semibold mb-4">Road Trip Bingo</h2>
-        <RoadTripBingo
-          locations={locations}
-          startLocation={start}
-          endLocation={destination}
-        />
-      </div>
+          {/* Packing List */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm p-6 h-full">
+              <h2 className="text-2xl font-semibold mb-4">Packing List</h2>
+              <PackingList startLocation={start} endLocation={destination} />
+            </div>
+          </div>
 
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-semibold mb-4">
-            Create Your Road Trip Playlist
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <PlaylistGenerator
-              startLocation={start}
-              endLocation={destination}
-            />
-            <PackingList startLocation={start} endLocation={destination} />
+          {/* Spotify Playlist Generator */}
+          <div className="lg:col-span-3">
+            <div className="bg-white rounded-lg shadow-sm p-6 h-full">
+              <h2 className="text-2xl font-semibold mb-4">
+                Road Trip Playlist
+              </h2>
+              <PlaylistGenerator
+                startLocation={start}
+                endLocation={destination}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
+        {/* Map Component */}
+        <div className="w-full  mb-6">
+          <MapComponent
+            isLoaded={isLoaded}
+            directions={directions}
+            locations={locations}
+            selectedRouteIndex={selectedRouteIndex}
+            locationTypes={locationTypes}
+            onMapLoad={setMap}
+            onMapUnmount={() => setMap(null)}
+            isLoadingLocations={isLoadingLocations}
+          />
+        </div>
+
+        {/* Road Trip Bingo */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-semibold mb-4">Road Trip Bingo</h2>
+          <RoadTripBingo
+            locations={locations}
+            startLocation={start}
+            endLocation={destination}
+          />
+        </div>
+      </div>
       <Footer />
     </div>
   );
