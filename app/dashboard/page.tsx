@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
+import RoadTripBingo from "../components/bingo";
 import { useEffect, useState, useCallback, useRef } from "react";
 import {
   GoogleMap,
@@ -635,26 +636,25 @@ export default function Dashboard() {
               </>
             )}
 
-            {isLoadingLocations &&
-              locations.map((location, index) => {
-                const locationType = locationTypes.find(
-                  (t) => t.value === location.type
-                );
-                return (
-                  <Marker
-                    key={`location-${index}`}
-                    position={location.position}
-                    title={location.name}
-                    icon={{
-                      url: `http://maps.google.com/mapfiles/ms/icons/${
-                        locationType?.color || "red"
-                      }-dot.png`,
-                      scaledSize: new google.maps.Size(32, 32),
-                    }}
-                    onClick={() => setSelectedLocation(location)}
-                  />
-                );
-              })}
+            {locations.map((location, index) => {
+              const locationType = locationTypes.find(
+                (t) => t.value === location.type
+              );
+              return (
+                <Marker
+                  key={`location-${index}`}
+                  position={location.position}
+                  title={location.name}
+                  icon={{
+                    url: `http://maps.google.com/mapfiles/ms/icons/${
+                      locationType?.color || "red"
+                    }-dot.png`,
+                    scaledSize: new google.maps.Size(32, 32),
+                  }}
+                  onClick={() => setSelectedLocation(location)}
+                />
+              );
+            })}
 
             {selectedLocation && (
               <InfoWindow
@@ -712,6 +712,17 @@ export default function Dashboard() {
             Create Your Road Trip Playlist
           </h2>
           <PlaylistGenerator startLocation={start} endLocation={destination} />
+        </div>
+
+        <div className="mt-6 bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-2xl font-semibold mb-4">
+            Road Trip Bingo
+          </h2>
+          <RoadTripBingo 
+            locations={locations}
+            startLocation={start}
+            endLocation={destination}
+          />
         </div>
       </div>
       <Footer />
