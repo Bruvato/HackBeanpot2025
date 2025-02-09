@@ -3,6 +3,7 @@ import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
 import RoadTripBingo from "../components/bingo";
 import WeatherDisplay from "../components/weather-display";
+import PackingList from "../components/packing-list";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useLoadScript } from "@react-google-maps/api";
 import { Libraries } from "@googlemaps/js-api-loader";
@@ -324,7 +325,13 @@ export default function Dashboard() {
           <h2 className="text-2xl font-semibold mb-4">
             Create Your Road Trip Playlist
           </h2>
-          <PlaylistGenerator startLocation={start} endLocation={destination} />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <PlaylistGenerator
+              startLocation={start}
+              endLocation={destination}
+            />
+            <PackingList startLocation={start} endLocation={destination} />
+          </div>
         </div>
       </div>
 
