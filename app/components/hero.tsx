@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation"; // Import useRouter
 
 import { AiOutlineSearch } from "react-icons/ai";
+import { BsCalendarDate } from "react-icons/bs"; // Added calendar icon import
 
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -48,62 +49,144 @@ export default function Hero() {
   };
 
   return (
-    <section className="bg-gradient-to-r from-blue-400 to-green-400 py-20">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-center text-white dark:text-gray-200">
-          Plan Your Perfect Road Trip Adventure
-        </h1>
-        <p className="text-xl mb-8 text-center text-white dark:text-gray-300">
-          Discover amazing routes, attractions, and create unforgettable
-          memories
+    <section className="hero-section bg-gradient-to-r from-blue-400 to-green-400 py-20 relative overflow-hidden">
+      {/* Frog Family */}
+      <div className="absolute top-1/2 -right-20 transform -translate-y-1/2 text-[300px] rotate-[-10deg] opacity-20 pointer-events-none hero-frog">
+        🐸
+      </div>
+      <div className="absolute top-1/3 -right-10 transform -translate-y-1/2 text-[150px] rotate-[5deg] opacity-20 pointer-events-none hero-frog">
+        🐸
+      </div>
+      <div className="absolute top-2/3 -right-5 transform -translate-y-1/2 text-[100px] rotate-[-5deg] opacity-20 pointer-events-none hero-frog">
+        🐸
+      </div>
+
+      {/* Floating Lily Pads and Flies */}
+      <div
+        className="absolute top-10 left-10 text-6xl floating-lily pointer-events-none"
+        style={{ "--delay": "0s", "--rotate": "12deg" } as any}
+      >
+        🌿
+      </div>
+      <div
+        className="absolute bottom-10 right-20 text-6xl floating-lily pointer-events-none"
+        style={{ "--delay": "0.5s", "--rotate": "-12deg" } as any}
+      >
+        🌿
+      </div>
+      <div
+        className="absolute top-20 right-40 text-4xl floating-lily pointer-events-none"
+        style={{ "--delay": "1s", "--rotate": "45deg" } as any}
+      >
+        🌿
+      </div>
+      <div
+        className="absolute bottom-20 left-40 text-5xl floating-lily pointer-events-none"
+        style={{ "--delay": "1.5s", "--rotate": "-45deg" } as any}
+      >
+        🌿
+      </div>
+      <div
+        className="absolute top-40 left-[20%] text-5xl floating-lily pointer-events-none"
+        style={{ "--delay": "2s", "--rotate": "30deg" } as any}
+      >
+        🌿
+      </div>
+      <div
+        className="absolute bottom-40 right-[30%] text-4xl floating-lily pointer-events-none"
+        style={{ "--delay": "2.5s", "--rotate": "-30deg" } as any}
+      >
+        🌿
+      </div>
+
+      {/* Flying Insects */}
+      <div
+        className="absolute top-20 left-[30%] text-2xl floating-lily pointer-events-none"
+        style={{ "--delay": "1.2s", "--rotate": "180deg" } as any}
+      >
+        🪰
+      </div>
+      <div
+        className="absolute bottom-30 right-[40%] text-2xl floating-lily pointer-events-none"
+        style={{ "--delay": "2.1s", "--rotate": "90deg" } as any}
+      >
+        🪰
+      </div>
+      <div
+        className="absolute top-40 right-[20%] text-2xl floating-lily pointer-events-none"
+        style={{ "--delay": "0.8s", "--rotate": "270deg" } as any}
+      >
+        🪰
+      </div>
+
+      <div className="container mx-auto px-4 relative">
+        <div className="flex items-center justify-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold ml-4 text-center text-white dark:text-gray-200 drop-shadow-lg">
+            Hop Into Your Next Adventure!
+          </h1>
+        </div>
+        <p className="text-xl mb-12 text-center text-white dark:text-gray-300 drop-shadow-md">
+          Leap from place to place, making unfrogettable memories along the way!
+          <span className="inline-block ml-2 transform hover:scale-125 transition-transform">
+            🦗
+          </span>
         </p>
         <form
           onSubmit={handleSubmit}
-          className="max-w-3xl mx-auto bg-background rounded-lg shadow-md p-6"
+          className="max-w-3xl mx-auto space-y-6 backdrop-blur-lg bg-white/10 p-8 rounded-2xl border-2 border-white/20"
         >
-          {isLoaded && (
-            <div className="flex flex-wrap -mx-3 mb-4">
-              <div className="w-full md:w-1/3 px-3 mb-4 md:mb-0">
-                <Autocomplete>
-                  <Input
-                    type="text"
-                    placeholder="Choose starting point..."
-                    // value={start}
-                    // onChange={(e) => setStart(e.target.value)}
-                    ref={startRef}
-                    required
-                    className="w-full"
-                  />
-                </Autocomplete>
+          <div className="space-y-4">
+            {isLoaded && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative">
+                  <Autocomplete>
+                    <input
+                      ref={startRef}
+                      type="text"
+                      placeholder="Starting Lily Pad 🌿"
+                      className="w-full px-4 py-3 text-lg"
+                      required
+                    />
+                  </Autocomplete>
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lg opacity-50">
+                    🐸
+                  </span>
+                </div>
+                <div className="relative">
+                  <Autocomplete>
+                    <input
+                      ref={destinationRef}
+                      type="text"
+                      placeholder="Destination Pond 🌊"
+                      className="w-full px-4 py-3 text-lg"
+                      required
+                    />
+                  </Autocomplete>
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lg opacity-50">
+                    🎯
+                  </span>
+                </div>
               </div>
-              <div className="w-full md:w-1/3 px-3 mb-4 md:mb-0">
-                <Autocomplete>
-                  <Input
-                    type="text"
-                    placeholder="Choose destination..."
-                    // value={destination}
-                    // onChange={(e) => setDestination(e.target.value)}
-                    ref={destinationRef}
-                    required
-                    className="w-full"
-                  />
-                </Autocomplete>
-              </div>
-              <div className="w-full md:w-1/3 px-3 mb-4 md:mb-0">
-                <Input
-                  type="date"
-                  placeholder="Pick date..."
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full"
-                />
+            )}
+            <div className="relative w-full">
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full px-4 py-3 text-lg appearance-none bg-white"
+                min={new Date().toISOString().split("T")[0]}
+                style={{ colorScheme: "light" }}
+              />
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-lg pointer-events-none">
+                <BsCalendarDate className="w-6 h-6 text-primary opacity-70" />
               </div>
             </div>
-          )}
-          <div className="text-center">
-            <Button type="submit">
-              <AiOutlineSearch className="mr-2 h-4 w-4" /> Search Routes
-            </Button>
+            <button
+              type="submit"
+              className="froggy-button w-full text-lg font-semibold hover:scale-105 transition-transform"
+            >
+              Hop Into It! 🐸
+            </button>
           </div>
         </form>
       </div>

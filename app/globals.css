@@ -4,67 +4,40 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Super froggy colors! */
+    --background: 120 70% 95%;
+    --foreground: 125 80% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 120 60% 90%;
+    --muted-foreground: 125 70% 30%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 120 70% 95%;
+    --popover-foreground: 125 80% 20%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 120 80% 97%;
+    --card-foreground: 125 80% 20%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 120 70% 85%;
+    --input: 120 70% 85%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Froggy green! */
+    --primary: 125 90% 40%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Lily pad blue! */
+    --secondary: 190 95% 60%;
+    --secondary-foreground: 0 0% 100%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Fun accent! */
+    --accent: 45 100% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 90% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --ring: 215 20.2% 65.1%;
+    --ring: 125 90% 40%;
 
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-
-    --ring: 217.2 32.6% 17.5%;
+    --radius: 1.5rem;
   }
 }
 
@@ -72,104 +45,389 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply text-foreground;
+    font-family: "Comic Sans MS", cursive;
+    background-image: radial-gradient(
+        circle at center,
+        transparent 0%,
+        transparent 90%,
+        hsla(var(--primary), 0.2) 90%
+      ),
+      linear-gradient(
+        45deg,
+        hsla(120, 70%, 95%, 0.8) 0%,
+        hsla(125, 70%, 90%, 0.8) 100%
+      );
+    background-size: 30px 30px, 100% 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 }
 
-/* Additional global styles */
-html {
-  scroll-behavior: smooth;
+/* FROGGY ANIMATIONS */
+@keyframes hop {
+  0% {
+    transform: translateY(0) scaleY(1);
+  }
+  40% {
+    transform: translateY(-20px) scaleY(0.9);
+  }
+  60% {
+    transform: translateY(-25px) scaleY(1.1);
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
 }
 
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+@keyframes tongue {
+  0% {
+    transform: scaleY(0.1);
+    opacity: 0;
+  }
+  40% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  60% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0.1);
+    opacity: 0;
+  }
 }
 
-main {
-  flex: 1;
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--rotation));
+  }
+  50% {
+    transform: translateY(-10px) rotate(var(--rotation));
+  }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 10px;
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+/* Fun card styling */
+.card {
+  background: linear-gradient(135deg, hsl(var(--card)), hsl(var(--background)));
+  border: 3px solid hsl(var(--primary));
+  border-radius: var(--radius);
+  box-shadow: 5px 5px 0 hsl(var(--primary));
+  transform: rotate(-2deg);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-  border-radius: 5px;
+.card::before {
+  content: "🐸";
+  position: absolute;
+  right: -20px;
+  bottom: -20px;
+  font-size: 4rem;
+  opacity: 0.1;
+  transform: rotate(15deg);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+.card:hover {
+  transform: rotate(2deg) scale(1.02);
 }
 
-/* Focus styles */
-:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
+.card:hover::before {
+  animation: hop 0.6s ease;
 }
 
-/* Typography */
+/* Froggy buttons */
+.froggy-button {
+  background: linear-gradient(
+    45deg,
+    hsl(var(--primary)),
+    hsl(var(--secondary))
+  );
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.froggy-button::before {
+  content: "👅";
+  position: absolute;
+  left: 50%;
+  top: -20px;
+  transform: translateX(-50%) scaleY(0.1);
+  opacity: 0;
+  font-size: 1.2em;
+}
+
+.froggy-button:hover {
+  transform: translateY(-2px);
+}
+
+.froggy-button:hover::before {
+  animation: tongue 0.3s ease;
+}
+
+.froggy-button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+}
+
+.froggy-button:active::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Fun inputs */
+input,
+textarea,
+select {
+  border: 3px dashed hsl(var(--primary));
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.9);
+  transform: rotate(1deg);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  position: relative;
+  z-index: 1; /* Ensure inputs are above decorative elements */
+}
+
+input[type="date"] {
+  position: relative;
+  z-index: 2;
+  color: hsl(var(--primary));
+  font-weight: 500;
+  background: white;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0 0.5rem;
+  color: hsl(var(--primary));
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+input[type="date"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 0.4;
+}
+
+input[type="date"]::placeholder,
+input[type="date"]::-webkit-datetime-edit {
+  color: hsl(var(--primary));
+}
+
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  padding: 0 4px;
+  color: hsl(var(--primary));
+}
+
+input[type="date"]::-webkit-datetime-edit-text {
+  color: hsl(var(--primary));
+  opacity: 0.7;
+}
+
+input::placeholder {
+  color: hsl(var(--primary));
+  opacity: 0.6;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  transform: rotate(-1deg) scale(1.05);
+  box-shadow: 5px 5px 0 hsl(var(--primary));
+  outline: none;
+  background: white;
+}
+
+.relative span {
+  z-index: 1; /* Keep emoji below the interactive elements */
+  pointer-events: none; /* Make sure emoji doesn't interfere with clicks */
+}
+
+/* Froggy headings */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  @apply font-bold tracking-tight;
+  color: hsl(var(--primary));
+  transform: rotate(-1deg);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
 }
 
-h1 {
-  @apply text-4xl sm:text-5xl md:text-6xl;
+h1::before,
+h2::before {
+  content: "🐸";
+  margin-right: 0.5rem;
+  display: inline-block;
+  transition: transform 0.3s ease;
 }
 
-h2 {
-  @apply text-3xl sm:text-4xl md:text-5xl;
+h1:hover::before,
+h2:hover::before {
+  animation: hop 0.6s ease;
 }
 
-h3 {
-  @apply text-2xl sm:text-3xl md:text-4xl;
-}
-
-/* Links */
+/* Links that go ribbit */
 a {
-  @apply transition-colors duration-200;
+  color: hsl(var(--primary));
+  text-decoration: none;
+  position: relative;
 }
 
-/* Buttons */
-button,
-.button {
-  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background;
+a::after {
+  content: "🪰";
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  font-size: 0.8em;
+  opacity: 0;
+  transition: all 0.3s ease;
 }
 
-/* Forms */
-input,
-textarea,
-select {
-  @apply rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+a:hover::after {
+  opacity: 1;
+  animation: float 2s infinite;
 }
 
-/* Custom classes */
+/* Goofy scrollbar */
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+::-webkit-scrollbar-track {
+  background: repeating-linear-gradient(
+    45deg,
+    hsl(var(--background)),
+    hsl(var(--background)) 10px,
+    hsl(var(--muted)) 10px,
+    hsl(var(--muted)) 20px
+  );
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 100px;
+  border: 2px dashed white;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary));
+}
+
+/* Container with lily pad background */
 .container {
   @apply mx-auto px-4 sm:px-6 lg:px-8;
 }
 
+/* Fun section spacing */
 .section {
   @apply py-12 sm:py-16 md:py-20 lg:py-24;
+  position: relative;
 }
 
-.card {
-  @apply bg-card text-card-foreground rounded-lg border shadow-sm;
+.section::before {
+  content: "🌿";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 2rem;
 }
 
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600;
+/* Extra froggy stuff */
+::selection {
+  background: hsl(var(--primary));
+  color: white;
+}
+
+/* Loading animation */
+.loading::after {
+  content: "🐸";
+  animation: hop 1s infinite;
+}
+
+/* Froggy cursor */
+* {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>🐸</text></svg>")
+      16 0,
+    auto;
+}
+
+button:hover,
+a:hover {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>🐸</text></svg>")
+      16 0,
+    pointer;
+}
+
+/* Froggy form */
+form {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  padding: 2rem;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+form::before {
+  content: "🌿";
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  font-size: 2rem;
+  transform: rotate(-30deg);
+}
+
+form::after {
+  content: "🌿";
+  position: absolute;
+  bottom: -15px;
+  right: -15px;
+  font-size: 2rem;
+  transform: rotate(30deg);
 }

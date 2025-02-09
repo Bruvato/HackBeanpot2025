@@ -133,8 +133,8 @@ export default function RoadTripBingo({
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
       {hasWon && (
-        <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-lg text-center text-lg font-bold">
-          🎉 BINGO! You won! 🎉
+        <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-lg text-center text-lg font-bold animate-bounce">
+          🐸 BINGO! Ribbit! 🐸
         </div>
       )}
 
@@ -151,10 +151,10 @@ export default function RoadTripBingo({
               whitespace-pre-wrap break-words
               ${
                 square.text === "FREE SPACE"
-                  ? "bg-blue-600 text-white border-blue-700 font-bold text-2xl"
+                  ? "bg-primary text-white border-primary font-bold text-2xl"
                   : square.isMarked
-                  ? "bg-blue-500 text-white border-blue-600"
-                  : "bg-white hover:bg-blue-50 border-gray-300"
+                  ? "bg-green-500 text-white border-green-600 hover:bg-green-600"
+                  : "bg-white hover:bg-green-50 border-green-300"
               }
               ${
                 square.text.length > 45
@@ -166,9 +166,12 @@ export default function RoadTripBingo({
                   : "text-base"
               }
               leading-tight font-medium
+              transform hover:scale-105 hover:-rotate-1
+              shadow-md hover:shadow-lg
             `}
           >
             {square.text}
+            {square.isMarked && <span className="absolute text-xs mt-8">🐸</span>}
           </button>
         ))}
       </div>
@@ -176,7 +179,7 @@ export default function RoadTripBingo({
       <div className="flex justify-center">
         <button
           onClick={resetBoard}
-          className="px-8 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-lg font-medium"
+          className="froggy-button px-8 py-3 text-lg font-medium"
         >
           New Board
         </button>
