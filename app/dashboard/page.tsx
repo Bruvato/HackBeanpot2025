@@ -2,7 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
 import { useEffect, useState, useCallback } from 'react';
-import { GoogleMap, useLoadScript, DirectionsService, DirectionsRenderer } from "@react-google-maps/api";
+import { GoogleMap, useLoadScript, DirectionsService, DirectionsRenderer, Libraries } from "@react-google-maps/api";
 
 const mapContainerStyle = {
   width: '100%',
@@ -14,7 +14,7 @@ const center = {
   lng: -71.0589
 };
 
-const libraries = ["maps"];
+const libraries: Libraries = ["places"];
 
 const mapOptions = {
   mapTypeId: 'satellite',
@@ -33,30 +33,35 @@ const mapOptions = {
   }
 };
 
+interface RouteInfo {
+  distance: string;
+  duration: string;
+}
+
 export default function Dashboard() {
   const searchParams = useSearchParams();
   const start = searchParams.get("start") || "Unknown Start";
   const destination = searchParams.get("destination") || "Unknown Destination";
   const date = searchParams.get("date") || "Not Specified";
 
-  const [directions, setDirections] = useState(null);
-  const [routeInfo, setRouteInfo] = useState(null);
-  const [error, setError] = useState(null);
+  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+  const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
     libraries,
   });
 
-  const [map, setMap] = useState(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
 
-  const onLoad = useCallback(function callback(map) {
+  const onLoad = useCallback(function callback(map: google.maps.Map) {
     map.setMapTypeId('satellite');
     map.setTilt(45);
     setMap(map);
   }, []);
 
-  const onUnmount = useCallback(function callback(map) {
+  const onUnmount = useCallback(function callback(map: google.maps.Map | null) {
     setMap(null);
   }, []);
 
@@ -71,17 +76,19 @@ export default function Dashboard() {
           travelMode: google.maps.TravelMode.DRIVING,
         },
         (result, status) => {
-          if (status === google.maps.DirectionsStatus.OK) {
+          if (status === google.maps.DirectionsStatus.OK && result) {
             setDirections(result);
             setError(null);
 
             // Extract route information
             if (result.routes[0] && result.routes[0].legs[0]) {
               const leg = result.routes[0].legs[0];
-              setRouteInfo({
-                distance: leg.distance.text,
-                duration: leg.duration.text,
-              });
+              if (leg.distance && leg.duration) {
+                setRouteInfo({
+                  distance: leg.distance.text,
+                  duration: leg.duration.text,
+                });
+              }
             }
 
             // Adjust the map view to show the route
