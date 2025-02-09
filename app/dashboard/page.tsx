@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
 import RoadTripBingo from "../components/bingo";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import {
   GoogleMap,
   useLoadScript,
