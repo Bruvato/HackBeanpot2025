@@ -1,5 +1,11 @@
 import { Location } from "../types/interfaces";
 
+interface ExtendedPlaceResult extends google.maps.places.PlaceResult {
+  editorial_summary?: {
+    overview: string;
+  };
+}
+
 export const getPlaceDetails = async (
   placeId: string,
   service: google.maps.places.PlacesService
@@ -15,7 +21,7 @@ export const getPlaceDetails = async (
         placeId: placeId,
         fields: ["rating", "photos", "editorial_summary", "formatted_address"],
       },
-      (place: google.maps.places.PlaceResult | null, status) => {
+      (place: ExtendedPlaceResult | null, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && place) {
           const details: {
             rating?: number;
@@ -35,8 +41,9 @@ export const getPlaceDetails = async (
           }
 
           if (
-            "editorial_summary" in place &&
-            (place.editorial_summary as any)?.overview
+            place.editorial_summary &&
+            'overview' in place.editorial_summary &&
+            place.editorial_summary.overview
           ) {
             details.description = (place.editorial_summary as any)?.overview;
           }
