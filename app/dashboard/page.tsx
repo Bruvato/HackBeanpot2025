@@ -1,5 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
+import PlaylistGenerator from "../components/playlist-generator";
 
 import { APIProvider, Map, limitTiltRange } from "@vis.gl/react-google-maps";
 
@@ -42,23 +43,12 @@ export default function Dashboard() {
       <p>Starting Location: {start}</p>
       <p>Destination: {destination}</p>
       <p>Trip Date: {date}</p>
-
-      <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}>
-        <DeckGL
-          initialViewState={INITIAL_VIEW_STATE}
-          layers={layers}
-          controller={true}
-          onViewStateChange={limitTiltRange}
-        >
-          <Map
-            style={{ width: "100vw", height: "100vh" }}
-            defaultCenter={{ lat: 22.54992, lng: 0 }}
-            defaultZoom={3}
-            gestureHandling={"greedy"}
-            disableDefaultUI={true}
-          />
-        </DeckGL>
-      </APIProvider>
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">
+          Create Your Road Trip Playlist
+        </h2>
+        <PlaylistGenerator startLocation={start} endLocation={destination} />
+      </div>
     </div>
   );
 }
