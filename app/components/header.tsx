@@ -33,7 +33,7 @@ export default function Header() {
               </Link>
             </li>
           </ul>
-          {/* <ThemeToggle /> */}
+          <ThemeToggle />
         </nav>
       </div>
     </header>
