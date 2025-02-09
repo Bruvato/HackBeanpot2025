@@ -12,7 +12,7 @@ async function generatePlaylistDescription(startLocation: string, endLocation: s
 
     const prompt = `Create a short, fun Spotify playlist description for a road trip from ${startLocation} to ${endLocation}. 
                    Include the mood of the journey and why the music fits the trip. 
-                   Keep it under 300 characters and make it engaging.`;
+                   Keep it under 300 characters and make it engaging. Make sure it does not get cut off.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -35,7 +35,7 @@ async function getLocationGenres(location: string) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    const prompt = `What are the top 3 music genres that best represent ${location}? Consider the local music scene, cultural background, and overall vibe of the location. Return only the genre names separated by commas, nothing else.`;
+    const prompt = `What are the top 5 most listened-to Spotify genres that best represent ${location}? Return genre names spearated by comma.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
