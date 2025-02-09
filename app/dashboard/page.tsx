@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import {
   GoogleMap,
   useLoadScript,
@@ -454,267 +454,277 @@ export default function Dashboard() {
     throw new Error("Missing GOOGLE_MAPS_API_KEY");
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-2xl font-bold mb-4">Your Road Trip</h1>
+    <Suspense>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="max-w-7xl mx-auto p-6">
+          <div className="rounded-lg shadow-sm p-6 mb-6">
+            <h1 className="text-2xl font-bold mb-4">Your Road Trip</h1>
 
-          <div className="mb-6 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Starting Point
-                </label>
-                <Autocomplete
-                  onLoad={onStartAutocompleteLoad}
-                  onPlaceChanged={onStartPlaceChanged}
-                  options={{ types: ["geocode"] }}
-                >
-                  <Input
-                    type="text"
-                    placeholder="Choose starting point..."
-                    value={startInput}
-                    onChange={(e) => setStartInput(e.target.value)}
-                    required
-                    className="w-full p-2 border rounded-md"
-                  />
-                </Autocomplete>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Destination
-                </label>
-                <Autocomplete
-                  onLoad={onDestAutocompleteLoad}
-                  onPlaceChanged={onDestPlaceChanged}
-                  options={{ types: ["geocode"] }}
-                >
-                  <Input
-                    type="text"
-                    placeholder="Choose destination..."
-                    value={destinationInput}
-                    onChange={(e) => setDestinationInput(e.target.value)}
-                    required
-                    className="w-full p-2 border rounded-md"
-                  />
-                </Autocomplete>
-              </div>
-            </div>
-
-            <div className="flex gap-4 mt-4">
-              <label className="flex items-center space-x-2">
-                <Input
-                  type="checkbox"
-                  checked={avoidHighways}
-                  onChange={(e) => setAvoidHighways(e.target.checked)}
-                  className="form-checkbox h-4 w-4 text-blue-600"
-                />
-                <span className="text-muted-foreground">Avoid Highways</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <Input
-                  type="checkbox"
-                  checked={avoidTolls}
-                  onChange={(e) => setAvoidTolls(e.target.checked)}
-                  className="form-checkbox h-4 w-4 text-blue-600"
-                />
-                <span className="text-muted-foreground">Avoid Tolls</span>
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                Show Places:
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {locationTypes.map((type) => (
-                  <label key={type.value} className="inline-flex items-center">
-                    <Input
-                      type="checkbox"
-                      checked={selectedTypes.includes(type.value)}
-                      onChange={(e) => {
-                        setSelectedTypes((prev) =>
-                          e.target.checked
-                            ? [...prev, type.value]
-                            : prev.filter((t) => t !== type.value)
-                        );
-                      }}
-                      className="form-checkbox h-4 w-4"
-                    />
-                    <span className="ml-2 text-sm text-muted-foreground">
-                      {type.label}
-                    </span>
+            <div className="mb-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Starting Point
                   </label>
-                ))}
+                  <Autocomplete
+                    onLoad={onStartAutocompleteLoad}
+                    onPlaceChanged={onStartPlaceChanged}
+                    options={{ types: ["geocode"] }}
+                  >
+                    <Input
+                      type="text"
+                      placeholder="Choose starting point..."
+                      value={startInput}
+                      onChange={(e) => setStartInput(e.target.value)}
+                      required
+                      className="w-full p-2 border rounded-md"
+                    />
+                  </Autocomplete>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Destination
+                  </label>
+                  <Autocomplete
+                    onLoad={onDestAutocompleteLoad}
+                    onPlaceChanged={onDestPlaceChanged}
+                    options={{ types: ["geocode"] }}
+                  >
+                    <Input
+                      type="text"
+                      placeholder="Choose destination..."
+                      value={destinationInput}
+                      onChange={(e) => setDestinationInput(e.target.value)}
+                      required
+                      className="w-full p-2 border rounded-md"
+                    />
+                  </Autocomplete>
+                </div>
               </div>
-            </div>
 
-            <p className="">
-              From: <span className="font-medium">{start}</span>
-            </p>
-            <p className="">
-              To: <span className="font-medium">{destination}</span>
-            </p>
-            <p className="">
-              Date: <span className="font-medium">{date}</span>
-            </p>
+              <div className="flex gap-4 mt-4">
+                <label className="flex items-center space-x-2">
+                  <Input
+                    type="checkbox"
+                    checked={avoidHighways}
+                    onChange={(e) => setAvoidHighways(e.target.checked)}
+                    className="form-checkbox h-4 w-4 text-blue-600"
+                  />
+                  <span className="text-muted-foreground">Avoid Highways</span>
+                </label>
+                <label className="flex items-center space-x-2">
+                  <Input
+                    type="checkbox"
+                    checked={avoidTolls}
+                    onChange={(e) => setAvoidTolls(e.target.checked)}
+                    className="form-checkbox h-4 w-4 text-blue-600"
+                  />
+                  <span className="text-muted-foreground">Avoid Tolls</span>
+                </label>
+              </div>
 
-            {routeInfos.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <h3 className="text-lg font-semibold ">Available Routes:</h3>
-                {routeInfos.map((info, index) => (
-                  <div
-                    key={index}
-                    onClick={() => setSelectedRouteIndex(index)}
-                    className={`p-3 rounded-md cursor-pointer transition-all duration-200 hover:bg-blue-50
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-muted-foreground">
+                  Show Places:
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {locationTypes.map((type) => (
+                    <label
+                      key={type.value}
+                      className="inline-flex items-center"
+                    >
+                      <Input
+                        type="checkbox"
+                        checked={selectedTypes.includes(type.value)}
+                        onChange={(e) => {
+                          setSelectedTypes((prev) =>
+                            e.target.checked
+                              ? [...prev, type.value]
+                              : prev.filter((t) => t !== type.value)
+                          );
+                        }}
+                        className="form-checkbox h-4 w-4"
+                      />
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        {type.label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <p className="">
+                From: <span className="font-medium">{start}</span>
+              </p>
+              <p className="">
+                To: <span className="font-medium">{destination}</span>
+              </p>
+              <p className="">
+                Date: <span className="font-medium">{date}</span>
+              </p>
+
+              {routeInfos.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <h3 className="text-lg font-semibold ">Available Routes:</h3>
+                  {routeInfos.map((info, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setSelectedRouteIndex(index)}
+                      className={`p-3 rounded-md cursor-pointer transition-all duration-200 hover:bg-blue-50
                       ${
                         index === selectedRouteIndex
                           ? "bg-blue-100 border-l-4 border-blue-500 shadow-sm"
                           : "bg-gray-50 border-l-4 border-gray-300"
                       }`}
-                  >
-                    <p className="font-medium text-gray-900">
-                      Route {index + 1} {index === 0 && "(Fastest)"}
-                    </p>
-                    <div className="mt-1 text-sm">
-                      <span className="text-gray-600">Distance: </span>
-                      <span className="font-medium text-gray-900">
-                        {info.distance}
-                      </span>
-                      <span className="mx-2">•</span>
-                      <span className="text-gray-600">Duration: </span>
-                      <span className="font-medium text-gray-900">
-                        {info.duration}
-                      </span>
+                    >
+                      <p className="font-medium text-gray-900">
+                        Route {index + 1} {index === 0 && "(Fastest)"}
+                      </p>
+                      <div className="mt-1 text-sm">
+                        <span className="text-gray-600">Distance: </span>
+                        <span className="font-medium text-gray-900">
+                          {info.distance}
+                        </span>
+                        <span className="mx-2">•</span>
+                        <span className="text-gray-600">Duration: </span>
+                        <span className="font-medium text-gray-900">
+                          {info.duration}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
+            </div>
+            {error && (
+              <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md">
+                {error}
               </div>
             )}
           </div>
-          {error && (
-            <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
         </div>
-      </div>
 
-      <div className="w-full relative">
-        {isLoaded ? (
-          <GoogleMap
-            mapContainerStyle={mapContainerStyle}
-            center={center}
-            zoom={12}
-            onLoad={onLoad}
-            onUnmount={onUnmount}
-            options={mapOptions}
-          >
-            {directions && (
-              <>
-                {directions.routes.map((route, index) => (
-                  <DirectionsRenderer
-                    key={index}
-                    directions={{
-                      ...directions,
-                      routes: [route],
-                    }}
-                    options={{
-                      polylineOptions: {
-                        strokeColor:
-                          index === selectedRouteIndex ? "#4285F4" : "#45B6FE",
-                        strokeWeight: index === selectedRouteIndex ? 5 : 3,
-                        strokeOpacity: index === selectedRouteIndex ? 1 : 0.6,
-                      },
-                      suppressMarkers: false,
-                      preserveViewport: true,
-                    }}
-                  />
-                ))}
-              </>
-            )}
+        <div className="w-full relative">
+          {isLoaded ? (
+            <GoogleMap
+              mapContainerStyle={mapContainerStyle}
+              center={center}
+              zoom={12}
+              onLoad={onLoad}
+              onUnmount={onUnmount}
+              options={mapOptions}
+            >
+              {directions && (
+                <>
+                  {directions.routes.map((route, index) => (
+                    <DirectionsRenderer
+                      key={index}
+                      directions={{
+                        ...directions,
+                        routes: [route],
+                      }}
+                      options={{
+                        polylineOptions: {
+                          strokeColor:
+                            index === selectedRouteIndex
+                              ? "#4285F4"
+                              : "#45B6FE",
+                          strokeWeight: index === selectedRouteIndex ? 5 : 3,
+                          strokeOpacity: index === selectedRouteIndex ? 1 : 0.6,
+                        },
+                        suppressMarkers: false,
+                        preserveViewport: true,
+                      }}
+                    />
+                  ))}
+                </>
+              )}
 
-            {isLoadingLocations &&
-              locations.map((location, index) => {
-                const locationType = locationTypes.find(
-                  (t) => t.value === location.type
-                );
-                return (
-                  <Marker
-                    key={`location-${index}`}
-                    position={location.position}
-                    title={location.name}
-                    icon={{
-                      url: `http://maps.google.com/mapfiles/ms/icons/${
-                        locationType?.color || "red"
-                      }-dot.png`,
-                      scaledSize: new google.maps.Size(32, 32),
-                    }}
-                    onClick={() => setSelectedLocation(location)}
-                  />
-                );
-              })}
+              {isLoadingLocations &&
+                locations.map((location, index) => {
+                  const locationType = locationTypes.find(
+                    (t) => t.value === location.type
+                  );
+                  return (
+                    <Marker
+                      key={`location-${index}`}
+                      position={location.position}
+                      title={location.name}
+                      icon={{
+                        url: `http://maps.google.com/mapfiles/ms/icons/${
+                          locationType?.color || "red"
+                        }-dot.png`,
+                        scaledSize: new google.maps.Size(32, 32),
+                      }}
+                      onClick={() => setSelectedLocation(location)}
+                    />
+                  );
+                })}
 
-            {selectedLocation && (
-              <InfoWindow
-                position={selectedLocation.position}
-                onCloseClick={() => setSelectedLocation(null)}
-              >
-                <div className="max-w-sm p-2 text-gray-700">
-                  <h3 className="text-lg font-semibold mb-2">
-                    {selectedLocation.name}
-                  </h3>
+              {selectedLocation && (
+                <InfoWindow
+                  position={selectedLocation.position}
+                  onCloseClick={() => setSelectedLocation(null)}
+                >
+                  <div className="max-w-sm p-2 text-gray-700">
+                    <h3 className="text-lg font-semibold mb-2">
+                      {selectedLocation.name}
+                    </h3>
 
-                  {selectedLocation.photos &&
-                    selectedLocation.photos.length > 0 && (
-                      <div className="flex gap-2 mb-3 overflow-x-auto">
-                        {selectedLocation.photos.map((photo, i) => (
-                          <Image
-                            key={i}
-                            src={photo}
-                            alt={`${selectedLocation.name} photo ${i + 1}`}
-                            className="h-32 w-auto object-cover rounded"
-                          />
-                        ))}
-                      </div>
+                    {selectedLocation.photos &&
+                      selectedLocation.photos.length > 0 && (
+                        <div className="flex gap-2 mb-3 overflow-x-auto">
+                          {selectedLocation.photos.map((photo, i) => (
+                            <Image
+                              key={i}
+                              src={photo}
+                              alt={`${selectedLocation.name} photo ${i + 1}`}
+                              className="h-32 w-auto object-cover rounded"
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                    {selectedLocation.description && (
+                      <p className="text-sm text-gray-600 mb-2">
+                        {selectedLocation.description}
+                      </p>
                     )}
 
-                  {selectedLocation.description && (
-                    <p className="text-sm text-gray-600 mb-2">
-                      {selectedLocation.description}
-                    </p>
-                  )}
+                    {selectedLocation.address && (
+                      <p className="text-sm text-gray-500 mb-2">
+                        📍 {selectedLocation.address}
+                      </p>
+                    )}
 
-                  {selectedLocation.address && (
-                    <p className="text-sm text-gray-500 mb-2">
-                      📍 {selectedLocation.address}
-                    </p>
-                  )}
-
-                  {selectedLocation.rating && (
-                    <p className="text-sm font-medium">
-                      Rating: {selectedLocation.rating} ⭐
-                    </p>
-                  )}
-                </div>
-              </InfoWindow>
-            )}
-          </GoogleMap>
-        ) : (
-          <div>Loading...</div>
-        )}
-      </div>
-
-      <div className="max-w-7xl mx-auto p-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-semibold mb-4">
-            Create Your Road Trip Playlist
-          </h2>
-          <PlaylistGenerator startLocation={start} endLocation={destination} />
+                    {selectedLocation.rating && (
+                      <p className="text-sm font-medium">
+                        Rating: {selectedLocation.rating} ⭐
+                      </p>
+                    )}
+                  </div>
+                </InfoWindow>
+              )}
+            </GoogleMap>
+          ) : (
+            <div>Loading...</div>
+          )}
         </div>
+
+        <div className="max-w-7xl mx-auto p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-2xl font-semibold mb-4">
+              Create Your Road Trip Playlist
+            </h2>
+            <PlaylistGenerator
+              startLocation={start}
+              endLocation={destination}
+            />
+          </div>
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </Suspense>
   );
 }
