@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
 import RoadTripBingo from "../components/bingo";
+import WeatherDisplay from "../components/weather-display";
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import {
   GoogleMap,
@@ -99,6 +100,7 @@ export default function Dashboard() {
     "park",
     "museum",
     "shopping_mall",
+    "lodging",
   ]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
@@ -121,6 +123,7 @@ export default function Dashboard() {
     { value: "park", label: "Parks", color: "green" },
     { value: "museum", label: "Museums", color: "purple" },
     { value: "shopping_mall", label: "Shopping", color: "blue" },
+    { value: "lodging", label: "Hotels", color: "orange" },
   ];
 
   const { isLoaded } = useLoadScript({
@@ -535,6 +538,10 @@ export default function Dashboard() {
                       key={type.value}
                       className="inline-flex items-center"
                     >
+                      <div
+                        className="w-4 h-4 rounded-full mr-2"
+                        style={{ backgroundColor: type.color }}
+                      />
                       <Input
                         type="checkbox"
                         checked={selectedTypes.includes(type.value)}
@@ -642,25 +649,25 @@ export default function Dashboard() {
                 </>
               )}
 
-            {locations.map((location, index) => {
-              const locationType = locationTypes.find(
-                (t) => t.value === location.type
-              );
-              return (
-                <Marker
-                  key={`location-${index}`}
-                  position={location.position}
-                  title={location.name}
-                  icon={{
-                    url: `http://maps.google.com/mapfiles/ms/icons/${
-                      locationType?.color || "red"
-                    }-dot.png`,
-                    scaledSize: new google.maps.Size(32, 32),
-                  }}
-                  onClick={() => setSelectedLocation(location)}
-                />
-              );
-            })}
+              {locations.map((location, index) => {
+                const locationType = locationTypes.find(
+                  (t) => t.value === location.type
+                );
+                return (
+                  <Marker
+                    key={`location-${index}`}
+                    position={location.position}
+                    title={location.name}
+                    icon={{
+                      url: `http://maps.google.com/mapfiles/ms/icons/${
+                        locationType?.color || "red"
+                      }-dot.png`,
+                      scaledSize: new google.maps.Size(32, 32),
+                    }}
+                    onClick={() => setSelectedLocation(location)}
+                  />
+                );
+              })}
 
               {selectedLocation && (
                 <InfoWindow
@@ -712,11 +719,24 @@ export default function Dashboard() {
           )}
         </div>
 
+        {directions?.routes[0]?.legs[0] && (
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <WeatherDisplay
+              lat={directions.routes[0].legs[0].start_location.lat()}
+              lng={directions.routes[0].legs[0].start_location.lng()}
+              locationName={directions.routes[0].legs[0].start_address}
+            />
+            <WeatherDisplay
+              lat={directions.routes[0].legs[0].end_location.lat()}
+              lng={directions.routes[0].legs[0].end_location.lng()}
+              locationName={directions.routes[0].legs[0].end_address}
+            />
+          </div>
+        )}
+
         <div className="mt-6 bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-2xl font-semibold mb-4">
-            Road Trip Bingo
-          </h2>
-          <RoadTripBingo 
+          <h2 className="text-2xl font-semibold mb-4">Road Trip Bingo</h2>
+          <RoadTripBingo
             locations={locations}
             startLocation={start}
             endLocation={destination}
