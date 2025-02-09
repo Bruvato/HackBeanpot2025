@@ -13,16 +13,18 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       accessToken?: string;
-    }
+    };
   }
 }
 
 // Validate required environment variables
-if (!process.env.SPOTIFY_CLIENT_ID) throw new Error('Missing SPOTIFY_CLIENT_ID');
-if (!process.env.SPOTIFY_CLIENT_SECRET) throw new Error('Missing SPOTIFY_CLIENT_SECRET');
-if (!process.env.NEXTAUTH_SECRET) throw new Error('Missing NEXTAUTH_SECRET');
+if (!process.env.SPOTIFY_CLIENT_ID)
+  throw new Error("Missing SPOTIFY_CLIENT_ID");
+if (!process.env.SPOTIFY_CLIENT_SECRET)
+  throw new Error("Missing SPOTIFY_CLIENT_SECRET");
+if (!process.env.NEXTAUTH_SECRET) throw new Error("Missing NEXTAUTH_SECRET");
 
-const SPOTIFY_REFRESH_TOKEN_URL = 'https://accounts.spotify.com/api/token';
+const SPOTIFY_REFRESH_TOKEN_URL = "https://accounts.spotify.com/api/token";
 
 const scopes = [
   "playlist-modify-public",
@@ -38,13 +40,13 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     ).toString("base64");
 
     const response = await fetch(SPOTIFY_REFRESH_TOKEN_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Basic ${basicAuth}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${basicAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        grant_type: 'refresh_token',
+        grant_type: "refresh_token",
         refresh_token: token.refreshToken as string,
       }),
     });
@@ -62,10 +64,10 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
       accessTokenExpires: Date.now() + data.expires_in * 1000,
     };
   } catch (error) {
-    console.error('Error refreshing access token:', error);
+    console.error("Error refreshing access token:", error);
     return {
       ...token,
-      error: 'RefreshAccessTokenError',
+      error: "RefreshAccessTokenError",
     };
   }
 }
@@ -78,7 +80,7 @@ export const authOptions = {
       authorization: {
         params: {
           scope: scopes,
-          show_dialog: true
+          show_dialog: true,
         },
       },
     }),
@@ -89,7 +91,9 @@ export const authOptions = {
         return {
           accessToken: account.access_token,
           refreshToken: account.refresh_token,
-          accessTokenExpires: account.expires_at ? account.expires_at * 1000 : 0,
+          accessTokenExpires: account.expires_at
+            ? account.expires_at * 1000
+            : 0,
         };
       }
 
@@ -101,11 +105,11 @@ export const authOptions = {
       // Access token has expired, try to refresh it
       return await refreshAccessToken(token);
     },
-    async session({ session, token }: { session: Session, token: JWT }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (token) {
         session.accessToken = token.accessToken;
         session.error = token.error;
-        
+
         if (session.user) {
           session.user.accessToken = token.accessToken;
         }
@@ -114,8 +118,8 @@ export const authOptions = {
     },
   },
   pages: {
-    signIn: '/',
-    error: '/',
+    signIn: "/",
+    error: "/",
   },
   debug: true,
   secret: process.env.NEXTAUTH_SECRET,
