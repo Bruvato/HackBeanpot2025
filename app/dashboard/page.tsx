@@ -334,10 +334,12 @@ export default function Dashboard() {
               <h2 className="text-2xl font-semibold mb-4">
                 Road Trip Playlist
               </h2>
-              <PlaylistGenerator
-                startLocation={start}
-                endLocation={destination}
-              />
+              <div className="min-h-[450px]">
+                <PlaylistGenerator
+                  startLocation={start}
+                  endLocation={destination}
+                />
+              </div>
             </div>
           </div>
         </div>
