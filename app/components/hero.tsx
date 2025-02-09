@@ -11,6 +11,12 @@ import { Input } from "../components/ui/input";
 
 import { useJsApiLoader, Autocomplete } from "@react-google-maps/api";
 
+// Add custom type for lily pad styles
+interface LilyPadStyle extends React.CSSProperties {
+  "--delay": string;
+  "--rotate": string;
+}
+
 export default function Hero() {
   // const [start, setStart] = useState("");
   // const [destination, setDestination] = useState("");
@@ -64,37 +70,37 @@ export default function Hero() {
       {/* Floating Lily Pads and Flies */}
       <div
         className="absolute top-10 left-10 text-6xl floating-lily pointer-events-none"
-        style={{ "--delay": "0s", "--rotate": "12deg" } as any}
+        style={{ "--delay": "0s", "--rotate": "12deg" } as LilyPadStyle}
       >
         🌿
       </div>
       <div
         className="absolute bottom-10 right-20 text-6xl floating-lily pointer-events-none"
-        style={{ "--delay": "0.5s", "--rotate": "-12deg" } as any}
+        style={{ "--delay": "0.5s", "--rotate": "-12deg" } as LilyPadStyle}
       >
         🌿
       </div>
       <div
         className="absolute top-20 right-40 text-4xl floating-lily pointer-events-none"
-        style={{ "--delay": "1s", "--rotate": "45deg" } as any}
+        style={{ "--delay": "1s", "--rotate": "45deg" } as LilyPadStyle}
       >
         🌿
       </div>
       <div
         className="absolute bottom-20 left-40 text-5xl floating-lily pointer-events-none"
-        style={{ "--delay": "1.5s", "--rotate": "-45deg" } as any}
+        style={{ "--delay": "1.5s", "--rotate": "-45deg" } as LilyPadStyle}
       >
         🌿
       </div>
       <div
         className="absolute top-40 left-[20%] text-5xl floating-lily pointer-events-none"
-        style={{ "--delay": "2s", "--rotate": "30deg" } as any}
+        style={{ "--delay": "2s", "--rotate": "30deg" } as LilyPadStyle}
       >
         🌿
       </div>
       <div
         className="absolute bottom-40 right-[30%] text-4xl floating-lily pointer-events-none"
-        style={{ "--delay": "2.5s", "--rotate": "-30deg" } as any}
+        style={{ "--delay": "2.5s", "--rotate": "-30deg" } as LilyPadStyle}
       >
         🌿
       </div>
@@ -102,19 +108,19 @@ export default function Hero() {
       {/* Flying Insects */}
       <div
         className="absolute top-20 left-[30%] text-2xl floating-lily pointer-events-none"
-        style={{ "--delay": "1.2s", "--rotate": "180deg" } as any}
+        style={{ "--delay": "1.2s", "--rotate": "180deg" } as LilyPadStyle}
       >
         🪰
       </div>
       <div
         className="absolute bottom-30 right-[40%] text-2xl floating-lily pointer-events-none"
-        style={{ "--delay": "2.1s", "--rotate": "90deg" } as any}
+        style={{ "--delay": "2.1s", "--rotate": "90deg" } as LilyPadStyle}
       >
         🪰
       </div>
       <div
         className="absolute top-40 right-[20%] text-2xl floating-lily pointer-events-none"
-        style={{ "--delay": "0.8s", "--rotate": "270deg" } as any}
+        style={{ "--delay": "0.8s", "--rotate": "270deg" } as LilyPadStyle}
       >
         🪰
       </div>
