@@ -48,7 +48,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="bg-gradient-to-r from-blue-500 to-purple-600 py-20">
+    <section className="bg-gradient-to-r from-blue-400 to-green-400 py-20">
       <div className="container mx-auto px-4">
         <h1 className="text-4xl md:text-5xl font-bold mb-6 text-center text-white dark:text-gray-200">
           Plan Your Perfect Road Trip Adventure
