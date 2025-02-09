@@ -31,19 +31,49 @@ interface Track {
   uri: string;
 }
 
-async function searchLocationBasedTracks(location: string, accessToken: string) {
-  // Search for tracks related to the location
-  const searchResponse = await fetch(
-    `https://api.spotify.com/v1/search?q=${encodeURIComponent(location)}&type=track&limit=10`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+async function getLocationGenres(location: string) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+    const prompt = `What are the top 3 music genres that best represent ${location}? Consider the local music scene, cultural background, and overall vibe of the location. Return only the genre names separated by commas, nothing else.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const genres = response.text().trim();
+    
+    return genres.split(',').map(genre => genre.trim());
+  } catch (error) {
+    console.error('Error getting location genres:', error);
+    return ['pop', 'rock']; // fallback genres
+  }
+}
+
+async function searchGenreBasedTracks(genres: string[], accessToken: string) {
+  const tracks: Track[] = [];
   
-  const searchData = await searchResponse.json();
-  return searchData.tracks.items.map((track: Track) => track.uri);
+  // Search for tracks for each genre
+  for (const genre of genres) {
+    const searchResponse = await fetch(
+      `https://api.spotify.com/v1/search?q=genre:${encodeURIComponent(genre)}&type=track&limit=10`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    
+    const searchData = await searchResponse.json();
+    if (searchData.tracks?.items) {
+      // Get exactly 10 tracks for this genre
+      const genreTracks = searchData.tracks.items
+        .sort(() => Math.random() - 0.5) // Shuffle the tracks
+        .slice(0, 10); // Take exactly 10 tracks
+      tracks.push(...genreTracks);
+    }
+  }
+  
+  // Return all tracks (should be about 30 tracks - 10 per genre)
+  return tracks.map(track => track.uri);
 }
 
 export async function POST(req: Request) {
@@ -70,6 +100,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Failed to authenticate with Spotify' }, { status: 401 });
     }
 
+    // Get genres for both locations
+    const startLocationGenres = await getLocationGenres(startLocation);
+    const endLocationGenres = await getLocationGenres(endLocation);
+
     // Generate AI description
     const description = await generatePlaylistDescription(startLocation, endLocation);
 
@@ -83,7 +117,7 @@ export async function POST(req: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: `Journey from ${startLocation} to ${endLocation}`,
+          name: `Road Trip from ${startLocation} to ${endLocation}`,
           description: description,
           public: true,
         }),
@@ -98,9 +132,9 @@ export async function POST(req: Request) {
 
     const playlistData = await playlistResponse.json();
 
-    // Get tracks for both locations
-    const startLocationTracks = await searchLocationBasedTracks(startLocation, accessToken);
-    const endLocationTracks = await searchLocationBasedTracks(endLocation, accessToken);
+    // Get tracks based on genres for both locations
+    const startLocationTracks = await searchGenreBasedTracks(startLocationGenres, accessToken);
+    const endLocationTracks = await searchGenreBasedTracks(endLocationGenres, accessToken);
     
     // Combine tracks
     const allTracks = [...startLocationTracks, ...endLocationTracks];
@@ -125,6 +159,8 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       playlistUrl: playlistData.external_urls.spotify,
+      startLocationGenres,
+      endLocationGenres
     });
   } catch (error) {
     console.error('Error creating playlist:', error);
