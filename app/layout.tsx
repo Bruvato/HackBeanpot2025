@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "./components/theme-provider";
 import AuthProvider from "./components/providers/auth-provider";
 import "./globals.css";
+import { Suspense } from "react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,7 +26,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
