@@ -454,7 +454,7 @@ export default function Dashboard() {
     throw new Error("Missing GOOGLE_MAPS_API_KEY");
 
   return (
-    <Suspense>
+    <Suspense fallback={<h1>Loading...</h1>}>
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="max-w-7xl mx-auto p-6">
