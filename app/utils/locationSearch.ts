@@ -36,9 +36,9 @@ export const getPlaceDetails = async (
 
           if (
             "editorial_summary" in place &&
-            place.editorial_summary?.overview
+            (place.editorial_summary as any)?.overview
           ) {
-            details.description = place.editorial_summary.overview;
+            details.description = (place.editorial_summary as any)?.overview;
           }
 
           if (place.formatted_address) {
@@ -154,7 +154,10 @@ export const findLocationsAlongRoute = async (
             ) {
               processedPlaces.add(place.place_id);
               try {
-                const details = await getPlaceDetails(place.place_id, placesService);
+                const details = await getPlaceDetails(
+                  place.place_id,
+                  placesService
+                );
                 newLocations.push({
                   name: place.name,
                   position: place.geometry.location,
