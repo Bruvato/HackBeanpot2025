@@ -101,6 +101,7 @@ export default function Dashboard() {
     "museum",
     "shopping_mall",
     "lodging",
+    "gas_station",
   ]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
@@ -115,15 +116,20 @@ export default function Dashboard() {
 
   const locationTypes = [
     {
+      value: "restaurant",
+      label: "Restaurants",
+      color: "red",
+    },
+    {
       value: "tourist_attraction",
       label: "Tourist Attractions",
-      color: "yellow",
+      color: "green",
     },
-    { value: "restaurant", label: "Restaurants", color: "red" },
-    { value: "park", label: "Parks", color: "green" },
-    { value: "museum", label: "Museums", color: "purple" },
-    { value: "shopping_mall", label: "Shopping", color: "blue" },
+    { value: "park", label: "Parks", color: "purple" },
+    { value: "museum", label: "Museums", color: "yellow" },
+    { value: "shopping_mall", label: "Shopping", color: "pink" },
     { value: "lodging", label: "Hotels", color: "orange" },
+    { value: "gas_station", label: "Gas Stations", color: "blue" },
   ];
 
   const { isLoaded } = useLoadScript({
@@ -216,8 +222,14 @@ export default function Dashboard() {
                 );
             }
 
-            if (place.editorial_summary?.overview) {
-              details.description = place.editorial_summary.overview;
+            const placeWithEditorial = place as google.maps.places.PlaceResult &
+              ExtendedPlaceResult;
+            if (
+              placeWithEditorial.editorial_summary &&
+              placeWithEditorial.editorial_summary.overview
+            ) {
+              details.description =
+                placeWithEditorial.editorial_summary.overview;
             }
 
             if (place.formatted_address) {
