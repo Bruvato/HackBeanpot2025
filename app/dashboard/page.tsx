@@ -1,11 +1,9 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import PlaylistGenerator from "../components/playlist-generator";
-import { useEffect, useState, useCallback } from 'react';
-import { GoogleMap, useLoadScript, DirectionsService, DirectionsRenderer, Libraries } from "@react-google-maps/api";
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { GoogleMap, useLoadScript, DirectionsService, DirectionsRenderer, Libraries, Autocomplete } from "@react-google-maps/api";
 import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
-import { AiOutlineSearch } from "react-icons/ai";
 
 const mapContainerStyle = {
   width: '100%',
@@ -52,6 +50,8 @@ export default function Dashboard() {
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const [routeInfo, setRouteInfo] = useState<RouteInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const startAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  const destAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
@@ -70,10 +70,32 @@ export default function Dashboard() {
     setMap(null);
   }, []);
 
-  const handleUpdateRoute = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStart(startInput);
-    setDestination(destinationInput);
+  const onStartAutocompleteLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    startAutocompleteRef.current = autocomplete;
+  };
+
+  const onDestAutocompleteLoad = (autocomplete: google.maps.places.Autocomplete) => {
+    destAutocompleteRef.current = autocomplete;
+  };
+
+  const onStartPlaceChanged = () => {
+    if (startAutocompleteRef.current) {
+      const place = startAutocompleteRef.current.getPlace();
+      if (place.formatted_address) {
+        setStartInput(place.formatted_address);
+        setStart(place.formatted_address);
+      }
+    }
+  };
+
+  const onDestPlaceChanged = () => {
+    if (destAutocompleteRef.current) {
+      const place = destAutocompleteRef.current.getPlace();
+      if (place.formatted_address) {
+        setDestinationInput(place.formatted_address);
+        setDestination(place.formatted_address);
+      }
+    }
   };
 
   useEffect(() => {
@@ -132,37 +154,44 @@ export default function Dashboard() {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Your Road Trip</h1>
           
-          <form onSubmit={handleUpdateRoute} className="mb-6 space-y-4">
+          <div className="mb-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Starting Point</label>
-                <Input
-                  type="text"
-                  placeholder="Choose starting point..."
-                  value={startInput}
-                  onChange={(e) => setStartInput(e.target.value)}
-                  required
-                  className="w-full"
-                />
+                <Autocomplete
+                  onLoad={onStartAutocompleteLoad}
+                  onPlaceChanged={onStartPlaceChanged}
+                  options={{ types: ['geocode'] }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Choose starting point..."
+                    value={startInput}
+                    onChange={(e) => setStartInput(e.target.value)}
+                    required
+                    className="w-full p-2 border rounded-md"
+                  />
+                </Autocomplete>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Destination</label>
-                <Input
-                  type="text"
-                  placeholder="Choose destination..."
-                  value={destinationInput}
-                  onChange={(e) => setDestinationInput(e.target.value)}
-                  required
-                  className="w-full"
-                />
+                <Autocomplete
+                  onLoad={onDestAutocompleteLoad}
+                  onPlaceChanged={onDestPlaceChanged}
+                  options={{ types: ['geocode'] }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Choose destination..."
+                    value={destinationInput}
+                    onChange={(e) => setDestinationInput(e.target.value)}
+                    required
+                    className="w-full p-2 border rounded-md"
+                  />
+                </Autocomplete>
               </div>
             </div>
-            <div className="flex justify-end">
-              <Button type="submit">
-                <AiOutlineSearch className="mr-2 h-4 w-4" /> Update Route
-              </Button>
-            </div>
-          </form>
+          </div>
 
           <div className="space-y-2">
             <p className="text-gray-600">From: <span className="font-medium text-gray-900">{start}</span></p>
