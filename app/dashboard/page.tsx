@@ -13,8 +13,6 @@ import {
   InfoWindow,
 } from "@react-google-maps/api";
 import { Input } from "../components/ui/input";
-import Header from "../components/header";
-import Footer from "../components/footer";
 
 const mapContainerStyle = {
   width: "100%",
@@ -92,11 +90,23 @@ export default function Dashboard() {
   const [selectedRouteIndex, setSelectedRouteIndex] = useState(0);
   const [locations, setLocations] = useState<Location[]>([]);
   const [isLoadingLocations, setIsLoadingLocations] = useState(false);
-  const [selectedTypes, setSelectedTypes] = useState(['tourist_attraction']);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
-  const startAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const destAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const searchDebounceRef = useRef<NodeJS.Timeout>();
+  const [selectedTypes, setSelectedTypes] = useState([
+    "tourist_attraction",
+    "restaurant",
+    "park",
+    "museum",
+    "shopping_mall",
+  ]);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  );
+  const startAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(
+    null
+  );
+  const destAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(
+    null
+  );
+  const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const locationTypes = [
     {
@@ -201,122 +211,140 @@ export default function Dashboard() {
     async (route: google.maps.DirectionsRoute) => {
       if (!map) return;
 
-    // Clear existing timeout if any
-    if (searchDebounceRef.current) {
-      clearTimeout(searchDebounceRef.current);
-    }
-
-    // Clear existing locations immediately
-    setLocations([]);
-    setIsLoadingLocations(true);
-
-    searchDebounceRef.current = setTimeout(async () => {
-      const placesService = new google.maps.places.PlacesService(map);
-      const newLocations: Location[] = [];
-      
-      // Get strategic points along the route
-      const searchPoints: google.maps.LatLng[] = [];
-      route.legs.forEach(leg => {
-        // Always include start and end of each leg
-        searchPoints.push(leg.start_location);
-        searchPoints.push(leg.end_location);
-        
-        leg.steps.forEach((step, stepIndex) => {
-          // For longer steps, add intermediate points
-          if (step.distance && step.distance.value > 1000) { // If step is longer than 1km
-            if (step.path && step.path.length > 2) {
-              // Add a point from the middle of the path
-              const midIndex = Math.floor(step.path.length / 2);
-              searchPoints.push(step.path[midIndex]);
-            }
-          }
-          
-          // Add points at major turns or route changes
-          if (stepIndex > 0) {
-            const prevStep = leg.steps[stepIndex - 1];
-            const angle = google.maps.geometry.spherical.computeHeading(
-              prevStep.end_location,
-              step.start_location
-            );
-            if (Math.abs(angle) > 30) { // If turn is greater than 30 degrees
-              searchPoints.push(step.start_location);
-            }
-          }
-        });
-      });
-
-      // Use a Map to efficiently track covered areas
-      const coveredAreas = new Map<string, boolean>();
-      const gridSize = 1000; // 1km grid
-
-      const getGridKey = (lat: number, lng: number) => {
-        return `${Math.floor(lat * gridSize) / gridSize},${Math.floor(lng * gridSize) / gridSize}`;
-      };
-
-      const filteredPoints = searchPoints.filter(point => {
-        const key = getGridKey(point.lat(), point.lng());
-        if (coveredAreas.has(key)) {
-          return false;
-        }
-        coveredAreas.set(key, true);
-        return true;
-      });
-
-      const searchPromises: Promise<void>[] = [];
-      const processedPlaces = new Set<string>(); // Track processed place IDs
-
-      for (const point of filteredPoints) {
-        for (const type of selectedTypes) {
-          const searchPromise = (async () => {
-            const request = {
-              location: point,
-              radius: 1000, // Reduced radius since we have better point distribution
-              type: type
-            };
-
-            try {
-              const results = await new Promise<google.maps.places.PlaceResult[]>((resolve, reject) => {
-                placesService.nearbySearch(request, (results, status) => {
-                  if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                    resolve(results);
-                  } else {
-                    reject(status);
-                  }
-                });
-              });
-
-              // Process only the top 5 results per point
-              for (const place of results.slice(0, 5)) {
-                if (place.geometry?.location && place.name && place.place_id &&
-                    !processedPlaces.has(place.place_id)) {
-                  processedPlaces.add(place.place_id);
-                  try {
-                    const details = await getPlaceDetails(place.place_id, placesService);
-                    newLocations.push({
-                      name: place.name,
-                      position: place.geometry.location,
-                      placeId: place.place_id,
-                      type: type,
-                      ...details
-                    });
-                  } catch (error) {
-                    console.error('Error fetching place details:', error);
-                  }
-                }
-              }
-            } catch (error) {
-              console.error('Error searching for places:', error);
-            }
-          })();
-          searchPromises.push(searchPromise);
-        }
+      // Clear existing timeout if any
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
       }
 
-      await Promise.all(searchPromises);
-      setLocations(newLocations);
-      setIsLoadingLocations(false);
-    }, 300); 
-  }, [map, selectedTypes]);
+      // Clear existing locations immediately
+      setLocations([]);
+      setIsLoadingLocations(true);
+
+      searchDebounceRef.current = setTimeout(async () => {
+        const placesService = new google.maps.places.PlacesService(map);
+        const newLocations: Location[] = [];
+
+        // Get strategic points along the route
+        const searchPoints: google.maps.LatLng[] = [];
+        route.legs.forEach((leg) => {
+          // Always include start and end of each leg
+          searchPoints.push(leg.start_location);
+          searchPoints.push(leg.end_location);
+
+          leg.steps.forEach((step, stepIndex) => {
+            // For longer steps, add intermediate points
+            if (step.distance && step.distance.value > 1000) {
+              // If step is longer than 1km
+              if (step.path && step.path.length > 2) {
+                // Add a point from the middle of the path
+                const midIndex = Math.floor(step.path.length / 2);
+                searchPoints.push(step.path[midIndex]);
+              }
+            }
+
+            // Add points at major turns or route changes
+            if (stepIndex > 0) {
+              const prevStep = leg.steps[stepIndex - 1];
+              const angle = google.maps.geometry.spherical.computeHeading(
+                prevStep.end_location,
+                step.start_location
+              );
+              if (Math.abs(angle) > 30) {
+                // If turn is greater than 30 degrees
+                searchPoints.push(step.start_location);
+              }
+            }
+          });
+        });
+
+        // Use a Map to efficiently track covered areas
+        const coveredAreas = new Map<string, boolean>();
+        const gridSize = 1000; // 1km grid
+
+        const getGridKey = (lat: number, lng: number) => {
+          return `${Math.floor(lat * gridSize) / gridSize},${
+            Math.floor(lng * gridSize) / gridSize
+          }`;
+        };
+
+        const filteredPoints = searchPoints.filter((point) => {
+          const key = getGridKey(point.lat(), point.lng());
+          if (coveredAreas.has(key)) {
+            return false;
+          }
+          coveredAreas.set(key, true);
+          return true;
+        });
+
+        const searchPromises: Promise<void>[] = [];
+        const processedPlaces = new Set<string>(); // Track processed place IDs
+
+        for (const point of filteredPoints) {
+          for (const type of selectedTypes) {
+            const searchPromise = (async () => {
+              const request = {
+                location: point,
+                radius: 1500, // Reduced radius since we have better point distribution
+                type: type,
+              };
+
+              try {
+                const results = await new Promise<
+                  google.maps.places.PlaceResult[]
+                >((resolve, reject) => {
+                  placesService.nearbySearch(request, (results, status) => {
+                    if (
+                      status === google.maps.places.PlacesServiceStatus.OK &&
+                      results
+                    ) {
+                      resolve(results);
+                    } else {
+                      reject(status);
+                    }
+                  });
+                });
+
+                // Process only the top 5 results per point
+                for (const place of results.slice(0, 5)) {
+                  if (
+                    place.geometry?.location &&
+                    place.name &&
+                    place.place_id &&
+                    !processedPlaces.has(place.place_id)
+                  ) {
+                    processedPlaces.add(place.place_id);
+                    try {
+                      const details = await getPlaceDetails(
+                        place.place_id,
+                        placesService
+                      );
+                      newLocations.push({
+                        name: place.name,
+                        position: place.geometry.location,
+                        placeId: place.place_id,
+                        type: type,
+                        ...details,
+                      });
+                    } catch (error) {
+                      console.error("Error fetching place details:", error);
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error("Error searching for places:", error);
+              }
+            })();
+            searchPromises.push(searchPromise);
+          }
+        }
+
+        await Promise.all(searchPromises);
+        setLocations(newLocations);
+        setIsLoadingLocations(false);
+      }, 300);
+    },
+    [map, selectedTypes]
+  );
 
   useEffect(() => {
     // Cleanup function to clear timeout
@@ -331,13 +359,17 @@ export default function Dashboard() {
     if (directions?.routes[selectedRouteIndex]) {
       findLocations(directions.routes[selectedRouteIndex]);
     } else {
-      setLocations([]); 
+      setLocations([]);
     }
   }, [directions, selectedRouteIndex, selectedTypes, findLocations]);
 
   useEffect(() => {
-    if (isLoaded && start !== "Unknown Start" && destination !== "Unknown Destination") {
-      setError(null); 
+    if (
+      isLoaded &&
+      start !== "Unknown Start" &&
+      destination !== "Unknown Destination"
+    ) {
+      setError(null);
       const directionsService = new google.maps.DirectionsService();
 
       directionsService.route(
@@ -420,16 +452,17 @@ export default function Dashboard() {
     throw new Error("Missing GOOGLE_MAPS_API_KEY");
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto p-6">
-        <div className="rounded-lg shadow-sm p-6 mb-6 text-card-foreground">
-          <h1 className="text-2xl font-bold mb-4">Your Road Trip</h1>
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            Your Road Trip
+          </h1>
 
           <div className="mb-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-muted-foreground">
+                <label className="block text-sm font-medium mb-1">
                   Starting Point
                 </label>
                 <Autocomplete
@@ -448,7 +481,7 @@ export default function Dashboard() {
                 </Autocomplete>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-muted-foreground">
+                <label className="block text-sm font-medium mb-1">
                   Destination
                 </label>
                 <Autocomplete
@@ -476,7 +509,7 @@ export default function Dashboard() {
                   onChange={(e) => setAvoidHighways(e.target.checked)}
                   className="form-checkbox h-4 w-4 text-blue-600"
                 />
-                <span className="text-muted-foreground">Avoid Highways</span>
+                <span className="text-gray-700">Avoid Highways</span>
               </label>
               <label className="flex items-center space-x-2">
                 <input
@@ -485,12 +518,12 @@ export default function Dashboard() {
                   onChange={(e) => setAvoidTolls(e.target.checked)}
                   className="form-checkbox h-4 w-4 text-blue-600"
                 />
-                <span className="text-muted-foreground">Avoid Tolls</span>
+                <span className="text-gray-700">Avoid Tolls</span>
               </label>
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">
+              <h3 className="text-sm font-medium text-gray-700">
                 Show Places:
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -508,7 +541,7 @@ export default function Dashboard() {
                       }}
                       className="form-checkbox h-4 w-4"
                     />
-                    <span className="ml-2 text-sm text-muted-foreground">
+                    <span className="ml-2 text-sm text-gray-700">
                       {type.label}
                     </span>
                   </label>
@@ -516,19 +549,15 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <p className="text-muted-foreground">
-              From:{" "}
-              <span className="font-medium text-card-foreground">{start}</span>
+            <p className="text-gray-600">
+              From: <span className="font-medium text-gray-900">{start}</span>
             </p>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600">
               To:{" "}
-              <span className="font-medium text-card-foreground">
-                {destination}
-              </span>
+              <span className="font-medium text-gray-900">{destination}</span>
             </p>
-            <p className="text-muted-foreground">
-              Date:{" "}
-              <span className="font-medium text-card-foreground">{date}</span>
+            <p className="text-gray-600">
+              Date: <span className="font-medium text-gray-900">{date}</span>
             </p>
 
             {routeInfos.length > 0 && (
@@ -679,15 +708,13 @@ export default function Dashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-        <div className="rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-2xl font-semibold mb-4">
             Create Your Road Trip Playlist
           </h2>
           <PlaylistGenerator startLocation={start} endLocation={destination} />
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }
