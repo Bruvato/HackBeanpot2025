@@ -1,8 +1,11 @@
-# RoadToad - Your Ultimate Road Trip Planner
+# 🐸RoadToad - Your Ultimate Road Trip Planner
+
 
 [Devpost](https://devpost.com/software/roadtoad)
 
 [Video Demo](https://youtu.be/X_MCxgd-IWA)
+
+Submission for HackBeanpot2025
 
 
 | ![full page1](https://github.com/user-attachments/assets/3483a03f-4f1b-4ef4-a2c1-661eff1e8bff) |
