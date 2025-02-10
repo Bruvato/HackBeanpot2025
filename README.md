@@ -1,4 +1,5 @@
 # 🐸RoadToad - Your Ultimate Road Trip Planner
+### Plan Your Perfect Road Trip Adventure. Discover amazing routes, attractions, and create unforgettable memories 
 
 
 [Devpost](https://devpost.com/software/roadtoad)
