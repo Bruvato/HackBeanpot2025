@@ -1,6 +1,37 @@
 # RoadToad - Your Ultimate Road Trip Planner
 
+[Devpost](https://devpost.com/software/roadtoad)
+
+[Video Demo](https://youtu.be/X_MCxgd-IWA)
+
+
+| ![full page1](https://github.com/user-attachments/assets/3483a03f-4f1b-4ef4-a2c1-661eff1e8bff) |
+| :--: |
+| *Home Page* |
+
+<br />
+
+| ![map options](https://github.com/user-attachments/assets/59fa45a4-1343-4956-b5a9-d37362e12d0c) | ![weather](https://github.com/user-attachments/assets/091415e6-16e0-4c16-b445-564eb383c452) | ![packing list](https://github.com/user-attachments/assets/b8a7b544-4542-49ea-ab4e-92a535fb9071) | ![playlist](https://github.com/user-attachments/assets/168b0017-534a-43fe-8f38-e6a89c86b033) |
+| :---: | :---: | :---: | :---: |
+| *Map Options* | *Weather* | *Packing List* | *Playlist* |
+
+<br />
+
+| ![map](https://github.com/user-attachments/assets/f1f1ab80-a87d-4fb1-a6a7-294826940b85) | 
+|:--:| 
+| *Map* |
+
+<br />
+
+| ![bingo](https://github.com/user-attachments/assets/32844675-adcb-4aa5-8f05-ad6c2fe5e8fd) |
+|:--:| 
+| *Bingo Board* |
+
+
+
+
 ## 🚀 Inspiration
+
 
 Road trips are all about adventure, but planning one can be overwhelming. We wanted to build a tool that makes it effortless to plan a perfect road trip by handling routing, discovering nearby attractions, creating a Spotify playlist, and even generating a smart packing list. Our goal was to create a seamless travel companion that combines AI-powered recommendations with real-time data to enhance every journey.
 
@@ -62,10 +93,10 @@ To run this project locally:
 ### **Prerequisites**
 - Install [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/)
 - Clone this repository:
-  ```sh
-  git clone https://github.com/your-username/road-trip-planner.git
-  cd road-trip-planner
-  ```
+```sh
+git clone https://github.com/your-username/HackBeanpot2025.git
+cd road-trip-planner
+```
 
 ### **Install Dependencies**
 ```sh
